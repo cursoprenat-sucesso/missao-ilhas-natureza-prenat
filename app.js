@@ -186,7 +186,7 @@
   function renderMap() {
     const map = app.querySelector('[data-island-map]');
     const story = app.querySelector('[data-map-story]');
-    if (story) story.textContent = 'Escolha sua próxima ilha. Cada etapa sorteia perguntas do banco e mantém a travessia diferente a cada tentativa.';
+    if (story) story.textContent = 'Escolha sua próxima ilha. A cada tentativa, a rodada pode vir diferente porque o jogo sorteia perguntas do banco.';
     if (!map) return;
     map.innerHTML = '';
     settings.phases.forEach((phase, index) => {
@@ -276,7 +276,7 @@
     app.querySelector('[data-lives]').textContent = '❤️'.repeat(run.lives) || '0';
     app.querySelector('[data-minpercent]').textContent = `${run.phase.minPercent}%`;
     app.querySelector('[data-score]').textContent = `${run.score}/${run.questions.length}`;
-    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length} · rodada sorteada`;
+    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length} · sorteada do banco`;
     app.querySelector('[data-quiz-progress]').style.width = `${(run.index / run.questions.length) * 100}%`;
     app.querySelector('[data-question-index]').textContent = `Questão ${run.index + 1}`;
     app.querySelector('[data-question-meta]').textContent = settings.showMetaToStudent

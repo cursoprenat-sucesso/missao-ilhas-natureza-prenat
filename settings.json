@@ -1,48 +1,48 @@
 {
-  "slug": "missao-ilhas-natureza-prenat-v4-flow-leve",
+  "slug": "missao-ilhas-natureza-prenat-v6",
   "brand": "PRENAT+",
   "missionName": "Missão Ilhas da Natureza",
   "missionKicker": "CAMPO DE TREINO PRENAT+",
-  "subtitle": "Uma travessia gamificada com desafios progressivos de Ciências da Natureza.",
-  "intro": "Avance pelas ilhas, conquiste patentes e treine Biologia, Física e Química em uma mesma missão.",
-  "studentThemeNote": "A cada tentativa, novas questões podem aparecer. Respire, jogue com estratégia e avance no seu ritmo.",
+  "subtitle": "Uma travessia leve, estratégica e progressiva em Ciências da Natureza.",
+  "intro": "Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e desbloquear novas patentes a cada conquista.",
+  "studentThemeNote": "Cada rodada sorteia questões do banco da ilha. Tente novamente quando precisar: o treino muda, e sua estratégia melhora.",
   "showMetaToStudent": false,
   "logo": "logo-prenat.png",
   "ranks": [
     {
       "name": "Ovo da Travessia",
       "icon": "🥚",
-      "description": "Todo grande percurso começa protegido pela casca. A missão está pronta para começar."
+      "description": "A jornada começou. Prepare a mente, proteja a calma e entre na primeira ilha."
     },
     {
       "name": "Filhote do Casco",
       "icon": "🐣",
-      "description": "Você rompeu a primeira casca e deu o primeiro passo no arquipélago PRENAT+."
+      "description": "Você rompeu a casca inicial e deu o primeiro passo no arquipélago PRENAT+."
     },
     {
       "name": "Explorador das Marés",
       "icon": "🌊",
-      "description": "Você já reconhece padrões, atravessa conceitos básicos e mantém a rota."
+      "description": "Você começou a reconhecer padrões e atravessar desafios com mais segurança."
     },
     {
       "name": "Guardião da Energia",
       "icon": "⚡",
-      "description": "Você sustenta o ritmo diante de questões médias e armadilhas conceituais."
+      "description": "Você manteve o ritmo diante de questões médias e armadilhas conceituais."
     },
     {
       "name": "Navegador da Vida",
       "icon": "🌱",
-      "description": "Você conecta dados, fenômenos, cotidiano e interpretação científica."
+      "description": "Você conectou dados, fenômenos, cotidiano e interpretação científica."
     },
     {
       "name": "Mestre da Evolução",
       "icon": "🧬",
-      "description": "Você venceu etapas densas e aprendeu a eliminar distratores fortes."
+      "description": "Você enfrentou questões profundas e aprendeu a eliminar distratores fortes."
     },
     {
       "name": "Grande Mestre da Natureza",
       "icon": "🏆",
-      "description": "Você completou a travessia e venceu o Boss Final da missão PRENAT+."
+      "description": "Você venceu o Boss Final e concluiu a travessia PRENAT+."
     }
   ],
   "phases": [
@@ -50,7 +50,7 @@
       "id": 1,
       "name": "Ilha 1",
       "title": "Rompendo a Casca",
-      "story": "Nesta primeira ilha, você vai aquecer a mente com questões básicas e misturadas de Ciências da Natureza. Para avançar, mantenha o foco e supere a meta.",
+      "story": "Nesta primeira ilha, você vai aquecer a mente com questões básicas e misturadas de Natureza. Para avançar, mantenha o foco e supere a meta.",
       "minPercent": 60,
       "lives": 3,
       "questionLimit": 10,
@@ -62,7 +62,7 @@
       "id": 2,
       "name": "Ilha 2",
       "title": "Caminho do Filhote",
-      "story": "Agora você vai enfrentar enunciados um pouco mais interpretativos, com alternativas parecidas e conceitos que exigem atenção.",
+      "story": "Nesta ilha, você vai enfrentar enunciados um pouco mais interpretativos, alternativas parecidas e conceitos que pedem atenção.",
       "minPercent": 65,
       "lives": 3,
       "questionLimit": 15,
@@ -74,7 +74,7 @@
       "id": 3,
       "name": "Ilha 3",
       "title": "Mar das Estratégias",
-      "story": "Nesta etapa, você vai cruzar gráficos, comparações, contextos do cotidiano e armadilhas típicas de prova.",
+      "story": "Agora você vai cruzar gráficos, comparações, contextos do cotidiano e armadilhas típicas de prova.",
       "minPercent": 70,
       "lives": 3,
       "questionLimit": 20,
