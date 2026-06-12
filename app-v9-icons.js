@@ -6,6 +6,16 @@
   let progress = null;
   let currentRun = null;
 
+  const FONT_STACKS = {
+    inter: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    arial: 'Arial, Helvetica, sans-serif',
+    trebuchet: '"Trebuchet MS", "Segoe UI", sans-serif',
+    verdana: 'Verdana, Geneva, sans-serif',
+    georgia: 'Georgia, "Times New Roman", serif',
+    times: '"Times New Roman", Times, serif',
+    palatino: '"Palatino Linotype", Palatino, Georgia, serif'
+  };
+
   const DEFAULT_SETTINGS = {
     slug: 'missao-ilhas-natureza-prenat-v7-tartarugas',
     brand: 'PRENAT+',
@@ -16,6 +26,8 @@
     studentThemeNote: 'Cada tentativa sorteia questões do banco da ilha. Volte, tente de novo e construa sua evolução passo a passo.',
     showMetaToStudent: false,
     logo: 'logo-prenat.png',
+    fontBodyKey: 'inter',
+    fontHeadingKey: 'inter',
     ranks: [
       { name:'Ovo da Travessia', icon:'🥚', visualStage:0, description:'Você ainda está no início da jornada. A casca protege sua preparação antes da primeira ilha.' },
       { name:'Filhote do Casco', icon:'🐢', visualStage:1, description:'Você saiu do ovo, rompeu a primeira casca e virou Filhote do Casco.' },
@@ -102,10 +114,16 @@
       `
         ${frame}
         <g transform="translate(90 76)">
-          <path d="M-16 -22 h32 v20 c0 15 -11 25 -16 28 c-5 -3 -16 -13 -16 -28 z" fill="#fccc46" stroke="#6d5b2e" stroke-width="4"/>
-          <path d="M-16 -14 h-12 c0 12 8 20 18 20 M16 -14 h12 c0 12 -8 20 -18 20" fill="none" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
-          <path d="M0 26 v12 M-16 38 h32" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
-          <path d="M-22 -29 L-12 -42 L0 -30 L12 -42 L22 -29" fill="none" stroke="#d01890" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="translate(-18 4)">
+            <path d="M-12 -20 h24 v16 c0 12 -8 20 -12 22 c-4 -2 -12 -10 -12 -22 z" fill="#fccc46" stroke="#6d5b2e" stroke-width="3.5"/>
+            <path d="M-12 -14 h-9 c0 8 6 14 13 14 M12 -14 h9 c0 8 -6 14 -13 14" fill="none" stroke="#6d5b2e" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M0 18 v8 M-12 26 h24" stroke="#6d5b2e" stroke-width="3.5" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(24 -6)">
+            <path d="M-8 22 C-5 0 4 -14 18 -24 C23 -9 26 4 26 18 C19 12 13 10 8 11 C1 12 -4 16 -8 22 Z" fill="#6f8794" stroke="#4b5a5f" stroke-width="3.8" stroke-linejoin="round"/>
+            <path d="M9 10 C14 9 19 11 24 16" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.4" stroke-linecap="round"/>
+          </g>
+          <path d="M-8 -26 L0 -34 L8 -26" fill="none" stroke="#d01890" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
       `
     ];
@@ -215,6 +233,10 @@
     if (missionMini) missionMini.textContent = settings.missionName;
     if (brandLogo && settings.logo) brandLogo.src = settings.logo;
     document.querySelectorAll('.mission-logo-img').forEach(img => { if (settings.logo) img.src = settings.logo; });
+    const bodyFont = FONT_STACKS[settings.fontBodyKey] || FONT_STACKS.inter;
+    const headingFont = FONT_STACKS[settings.fontHeadingKey] || bodyFont;
+    document.documentElement.style.setProperty('--student-body-font', bodyFont);
+    document.documentElement.style.setProperty('--student-heading-font', headingFont);
   }
 
   function stateKey() {

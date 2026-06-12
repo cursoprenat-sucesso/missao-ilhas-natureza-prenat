@@ -28,3 +28,9 @@ Depois de publicar no GitHub Pages, use:
 
 ## V8 Tartarugas Cachefix
 Esta versão força o navegador a carregar novos arquivos: `app-tartarugas-v8.js` e `style-tartarugas-v8.css`. Assim os ícones antigos não ficam presos no cache.
+
+
+## Novidades da versão 11
+- Ícone do Boss Final ajustado com composição de **troféu + predador**.
+- Painel do professor com seleção de **fonte do texto** e **fonte dos títulos** do aluno.
+- Mantido todo o restante do fluxo do professor e do aluno.

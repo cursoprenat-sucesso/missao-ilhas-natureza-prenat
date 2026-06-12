@@ -131,5 +131,7 @@
       "difficultyLabel": "Hard final",
       "iconStage": 6
     }
-  ]
+  ],
+  "fontBodyKey": "inter",
+  "fontHeadingKey": "inter"
 }

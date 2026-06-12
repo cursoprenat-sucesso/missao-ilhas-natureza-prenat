@@ -76,3 +76,8 @@
 .turtle-stage-6.result{
   filter: drop-shadow(0 10px 12px rgba(208,24,144,.18));
 }
+
+
+/* V11 - fontes configuráveis do aluno */
+.student-body,.student-body button,.student-body input,.student-body select,.student-body textarea{font-family:var(--student-body-font,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)}
+.student-body h1,.student-body h2,.student-body h3,.student-body .brand-area strong,.student-body .tiny-label,.student-body .kicker,.student-body .btn,.student-body .badge-pill,.student-body .meta-chip,.student-body .lock-badge,.student-body .completed-ribbon{font-family:var(--student-heading-font,var(--student-body-font,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif))}

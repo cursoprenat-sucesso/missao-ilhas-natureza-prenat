@@ -27,3 +27,6 @@ Depois de publicar no GitHub Pages, use:
 
 
 Atualização V8: se o navegador mostrar a versão antiga, use `?v=8` no final do link do aluno e pressione Ctrl+F5.
+
+
+Atualização recomendada após subir a V11: abra o link do aluno com `?v=11` no final e use `Ctrl + F5`.

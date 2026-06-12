@@ -3,6 +3,8 @@
   let settings = null;
   let questions = [];
 
+  const FONT_OPTIONS = ['inter','arial','trebuchet','verdana','georgia','times','palatino'];
+
   const DEFAULT_SETTINGS = {
     slug: 'missao-ilhas-natureza-prenat-v7-tartarugas',
     brand: 'PRENAT+',
@@ -13,6 +15,8 @@
     studentThemeNote: 'Cada rodada sorteia questões do banco da ilha. Tente novamente quando precisar: o treino muda, e sua estratégia melhora.',
     showMetaToStudent: false,
     logo: 'logo-prenat.png',
+    fontBodyKey: 'inter',
+    fontHeadingKey: 'inter',
     ranks: [
       { name:'Ovo da Travessia', icon:'🥚', visualStage:0, description:'Você ainda está no início da jornada. A casca protege sua preparação antes da primeira ilha.' },
       { name:'Filhote do Casco', icon:'🐢', visualStage:1, description:'Você saiu do ovo, rompeu a primeira casca e virou Filhote do Casco.' },
@@ -151,6 +155,8 @@
     setValue('introInput', settings.intro);
     setValue('studentThemeNoteInput', settings.studentThemeNote);
     setValue('showMetaInput', String(Boolean(settings.showMetaToStudent)));
+    setValue('fontBodyInput', FONT_OPTIONS.includes(settings.fontBodyKey) ? settings.fontBodyKey : 'inter');
+    setValue('fontHeadingInput', FONT_OPTIONS.includes(settings.fontHeadingKey) ? settings.fontHeadingKey : 'inter');
   }
 
   function collectConfigFromForm() {
@@ -162,6 +168,8 @@
     settings.intro = getValue('introInput');
     settings.studentThemeNote = getValue('studentThemeNoteInput');
     settings.showMetaToStudent = getValue('showMetaInput') === 'true';
+    settings.fontBodyKey = FONT_OPTIONS.includes(getValue('fontBodyInput')) ? getValue('fontBodyInput') : 'inter';
+    settings.fontHeadingKey = FONT_OPTIONS.includes(getValue('fontHeadingInput')) ? getValue('fontHeadingInput') : settings.fontBodyKey;
     settings.phases = settings.phases.map(phase => ({
       ...phase,
       name: getValue(`phase_${phase.id}_name`),
