@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Área do Professor | PRENAT+ Missão</title>
+  <title>Área do Professor | PRENAT+ RPG</title>
   <link rel="stylesheet" href="style.css" />
   <script>
     window.MathJax = { tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] }, svg: { fontCache: 'global' } };
@@ -16,7 +16,7 @@
       <img class="brand-logo" src="logo-prenat.png" alt="PRENAT+" onerror="this.style.display='none'" />
       <div>
         <strong>PRENAT+ | Professor</strong>
-        <span>Editor da Missão</span>
+        <span>Editor da Missão RPG</span>
       </div>
     </div>
     <a id="studentLinkTop" class="btn btn-soft" href="index.html" target="_blank" rel="noopener">Abrir jogo do aluno</a>
@@ -65,11 +65,12 @@
           <li>No GitHub, substitua os arquivos antigos pelos novos.</li>
           <li>O link do aluno atualiza sozinho em alguns minutos.</li>
         </ol>
-        <h2>Imagem e fórmula</h2>
-        <p>Para usar imagem em uma questão, envie a imagem para o GitHub junto com os arquivos e, no campo de imagem da questão, escreva apenas o nome do arquivo, por exemplo:</p>
-        <pre class="code-box">grafico-calorimetria.png</pre>
-        <p>Para fórmulas, você pode usar LaTeX:</p>
-        <pre class="code-box">\( Q = m \cdot c \cdot \Delta T \)</pre>
+        <h2>Imagem, subscrito e fórmula</h2>
+        <p>Agora o editor tem botões para inserir <strong>subscrito</strong>, <strong>sobrescrito</strong>, fórmula em LaTeX e símbolos comuns. Também existe um botão para transformar fórmulas químicas simples, como Na2CO3, em Na&lt;sub&gt;2&lt;/sub&gt;CO&lt;sub&gt;3&lt;/sub&gt;.</p>
+        <p>Para imagem, você pode escolher um arquivo do computador, arrastar uma imagem ou copiar uma imagem e colar na área da questão. O editor transforma a imagem em um código interno para o jogo carregar sem precisar subir a imagem separada.</p>
+        <pre class="code-box">H&lt;sub&gt;2&lt;/sub&gt;O
+Na&lt;sub&gt;2&lt;/sub&gt;CO&lt;sub&gt;3&lt;/sub&gt;
+\( Q = m \cdot c \cdot \Delta T \)</pre>
       </section>
 
       <section class="teacher-panel glass-card hidden" data-tab="config">
@@ -94,19 +95,32 @@
 
       <section class="teacher-panel glass-card hidden" data-tab="questoes">
         <h2>Cadastrar questões</h2>
-        <p class="warning-tip">As questões podem misturar Biologia, Física e Química em qualquer fase. Disciplina, tema e dificuldade são etiquetas internas para organização do professor.</p>
+        <p class="warning-tip">As questões podem misturar Biologia, Física e Química em qualquer fase. A disciplina, tema e dificuldade servem como etiqueta interna do professor.</p>
         <input type="hidden" id="editingQuestionId" />
         <div class="form-grid three">
           <div class="form-field"><label>Fase/ilha</label><select id="qPhase"></select></div>
           <div class="form-field"><label>Disciplina interna</label><input id="qDiscipline" placeholder="Física, Química, Biologia..." /></div>
           <div class="form-field"><label>Dificuldade interna</label><input id="qDifficulty" placeholder="Fácil, média, hard..." /></div>
           <div class="form-field full"><label>Tema interno</label><input id="qTopic" placeholder="Calorimetria, ecologia, separação de misturas..." /></div>
-          <div class="form-field full"><label>Enunciado</label><textarea id="qStatement" placeholder="Cole ou escreva o enunciado. Pode usar H&lt;sub&gt;2&lt;/sub&gt;O e fórmulas em LaTeX."></textarea></div>
-          <div class="form-field full"><label>Imagem da questão (opcional)</label><input id="qImage" placeholder="grafico.png ou https://..." /></div>
+          <div class="form-field full rich-field"><label>Enunciado</label><textarea id="qStatement" data-rich="true" placeholder="Cole ou escreva o enunciado. Use os botões abaixo para subscrito, sobrescrito e fórmula."></textarea></div>
+          <div class="form-field full">
+            <label>Imagem da questão (opcional)</label>
+            <input id="qImage" placeholder="Cole uma imagem abaixo, escolha arquivo, ou use URL https://..." />
+            <div class="image-tools">
+              <label class="btn btn-soft small file-label" for="qImageFile">Escolher imagem</label>
+              <input id="qImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
+              <button type="button" class="btn btn-soft small" id="clearImageBtn">Remover imagem</button>
+            </div>
+            <div id="imagePasteZone" class="image-paste-zone" tabindex="0">
+              <strong>Cole ou arraste a imagem aqui</strong>
+              <span>Copie uma imagem, clique nesta caixa e aperte Ctrl + V. Também pode arrastar o arquivo para cá.</span>
+            </div>
+            <div id="qImagePreviewWrap" class="image-preview hidden"><img id="qImagePreview" alt="Prévia da imagem da questão" /></div>
+          </div>
         </div>
         <h2 style="margin-top:24px">Alternativas</h2>
         <div id="optionsEditor"></div>
-        <div class="form-field full" style="margin-top:14px"><label>Comentário geral do gabarito</label><textarea id="qExplanation"></textarea></div>
+        <div class="form-field full rich-field" style="margin-top:14px"><label>Comentário geral do gabarito</label><textarea id="qExplanation" data-rich="true"></textarea></div>
         <div class="teacher-actions">
           <button class="btn btn-primary" id="saveQuestionBtn">Salvar questão</button>
           <button class="btn btn-soft" id="clearQuestionBtn">Limpar formulário</button>

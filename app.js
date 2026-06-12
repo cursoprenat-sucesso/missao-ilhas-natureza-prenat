@@ -186,31 +186,27 @@
   function renderMap() {
     const map = app.querySelector('[data-island-map]');
     const story = app.querySelector('[data-map-story]');
-    if (story) story.textContent = 'Cada ilha é uma etapa de dificuldade progressiva. A missão sorteia questões do banco, mistura Natureza e mantém o desafio vivo a cada tentativa.';
+    if (story) story.textContent = 'Escolha sua próxima ilha. Cada etapa sorteia perguntas do banco e mantém a travessia diferente a cada tentativa.';
     if (!map) return;
-    map.innerHTML = '<div class="map-route" aria-hidden="true"></div>';
+    map.innerHTML = '';
     settings.phases.forEach((phase, index) => {
       const unlocked = phase.id <= progress.unlockedPhase;
       const completed = progress.completedPhases.includes(phase.id);
       const phaseQuestions = getQuestionsForPhase(phase.id);
       const playableCount = getPlayableCount(phase, phaseQuestions.length);
       const rank = settings.ranks[phase.rewardRankIndex] || {};
+      const icon = index === settings.phases.length - 1 ? '🏆' : (rank.icon || islandIcons[index] || '🏝️');
       const card = document.createElement('article');
-      card.className = `journey-island island-${index + 1} ${unlocked ? 'island-open' : 'locked'} ${completed ? 'completed' : ''}`;
+      card.className = `island-card ${unlocked ? '' : 'locked'} ${completed ? 'completed' : ''}`;
       card.innerHTML = `
-        <div class="island-node">
-          <span class="island-step">${index + 1}</span>
-          <div class="island-scene">
-            <div class="water-halo"></div>
-            <div class="land-mass"></div>
-            <div class="island-symbol">${index === settings.phases.length - 1 ? '🏆' : (rank.icon || islandIcons[index] || '🏝️')}</div>
-          </div>
+        ${completed ? '<span class="completed-ribbon">CONQUISTADA</span>' : ''}
+        <span class="lock-badge">${completed ? '✓' : unlocked ? 'Aberta' : '🔒'}</span>
+        <div class="island-art">
+          <div class="island-orb"></div>
+          <div class="island-icon">${icon}</div>
         </div>
-        <div class="island-content">
-          <div class="island-status-row">
-            <span class="tiny-label">${escapeHtml(phase.name)}</span>
-            <span class="lock-badge">${completed ? 'Conquistada' : unlocked ? 'Aberta' : 'Bloqueada'}</span>
-          </div>
+        <div class="island-card-body">
+          <span class="tiny-label">${escapeHtml(phase.name)}</span>
           <h3>${escapeHtml(phase.title)}</h3>
           <p>${escapeHtml(phase.story)}</p>
           <div class="island-meta">
@@ -223,7 +219,8 @@
             ${completed ? 'Refazer ilha' : unlocked ? 'Entrar na ilha' : 'Bloqueada'}
           </button>
           ${unlocked && !phaseQuestions.length ? '<p class="small-muted">Ilha em preparação: ainda não há questões cadastradas.</p>' : ''}
-        </div>`;
+        </div>
+      `;
       map.appendChild(card);
     });
     map.querySelectorAll('[data-start-phase]').forEach(btn => btn.addEventListener('click', () => startPhase(Number(btn.dataset.startPhase))));
@@ -279,7 +276,7 @@
     app.querySelector('[data-lives]').textContent = '❤️'.repeat(run.lives) || '0';
     app.querySelector('[data-minpercent]').textContent = `${run.phase.minPercent}%`;
     app.querySelector('[data-score]').textContent = `${run.score}/${run.questions.length}`;
-    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length} · sorteada do banco da ilha`;
+    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length} · rodada sorteada`;
     app.querySelector('[data-quiz-progress]').style.width = `${(run.index / run.questions.length) * 100}%`;
     app.querySelector('[data-question-index]').textContent = `Questão ${run.index + 1}`;
     app.querySelector('[data-question-meta]').textContent = settings.showMetaToStudent
@@ -328,7 +325,7 @@
     panel.classList.remove('hidden');
     panel.classList.toggle('correct-feedback', isCorrect);
     panel.classList.toggle('wrong-feedback', !isCorrect);
-    app.querySelector('[data-feedback-title]').textContent = isCorrect ? 'Você avançou na ilha!' : (run.lives <= 0 ? 'As vidas acabaram nesta rodada.' : 'Armadilha encontrada — ajuste a rota.');
+    app.querySelector('[data-feedback-title]').textContent = isCorrect ? 'Boa! Você avançou.' : (run.lives <= 0 ? 'As vidas acabaram nesta rodada.' : 'Armadilha encontrada — ajuste a rota.');
     app.querySelector('[data-feedback-text]').innerHTML = buildFeedbackText(isCorrect, q, selected);
     app.querySelector('[data-feedback-descriptor]').innerHTML = selected?.feedback || (isCorrect ? 'Boa leitura: você identificou o ponto central da situação.' : 'Volte ao conceito-chave e tente perceber por que essa alternativa seduz.');
     const nextButton = app.querySelector('[data-action="next-question"]');
@@ -381,7 +378,7 @@
     app.querySelector('[data-result-kicker]').textContent = passed ? 'Ilha conquistada' : 'Travessia em treinamento';
     app.querySelector('[data-result-title]').textContent = passed ? 'Você venceu esta ilha!' : 'Ainda não foi dessa vez.';
     app.querySelector('[data-result-message]').textContent = passed
-      ? `Sucesso! Você superou ${run.phase.title}, abriu um novo caminho no arquipélago e conquistou a patente ${nextRank.name}. Continue: a próxima ilha já espera por você.`
+      ? `Sucesso! Você venceu ${run.phase.title}, abriu uma nova ilha e conquistou a patente ${nextRank.name}. Continue: a próxima etapa já está esperando por você.`
       : `Você fez ${percent}% e precisava de ${run.phase.minPercent}%. Isso não é fim de jornada: é ajuste de rota. Tente novamente; uma nova rodada será sorteada do banco desta ilha.`;
     app.querySelector('[data-result-score]').textContent = `${run.score}/${run.questions.length}`;
     app.querySelector('[data-result-percent]').textContent = `${percent}%`;
@@ -391,7 +388,7 @@
       : `<strong>Patente ainda bloqueada:</strong> vença esta ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}. Você pode tentar novamente quantas vezes precisar.`;
 
     const mainButton = app.querySelector('[data-action="result-main"]');
-    mainButton.textContent = passed ? 'Avançar para próxima ilha' : 'Tentar nova rodada';
+    mainButton.textContent = passed ? 'Seguir para a próxima ilha' : 'Tentar uma nova rodada';
     mainButton.addEventListener('click', () => {
       if (passed) {
         const nextPhase = settings.phases.find(p => p.id === run.phase.id + 1);

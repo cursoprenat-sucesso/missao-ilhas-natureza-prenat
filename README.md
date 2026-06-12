@@ -1,36 +1,33 @@
-# PRENAT+ | Missão Ilhas da Natureza V3 FLOW
+# PRENAT+ | Missão Ilhas da Natureza — V5 Editor Fácil
 
-Versão visual premium do jogo gamificado PRENAT+ para o Campo de Treino.
+Esta versão mantém o jogo do aluno com mapa leve, banco de questões sorteado por tentativa, vidas, metas, patentes e mensagens de flow.
+
+## Novidade principal da V5
+
+O painel do professor ficou mais fácil para cadastrar questões:
+
+- botão de **subscrito**: transforma seleção em `<sub>...</sub>`;
+- botão de **sobrescrito**: transforma seleção em `<sup>...</sup>`;
+- botão de **fórmula LaTeX**: insere `\( ... \)`;
+- botão **Auto química**: transforma fórmulas como `Na2CO3` em `Na<sub>2</sub>CO<sub>3</sub>`;
+- botões de símbolos: `→`, `⇌` e `Δ`;
+- imagem por arquivo, arrastar ou **Ctrl + V** na caixa da imagem;
+- prévia da imagem no painel do professor.
 
 ## Links
 
 - Aluno: `index.html`
 - Professor: `professor.html`
 
-## O que mudou na V3
+No GitHub Pages, o link do professor fica igual ao link do aluno, acrescentando `/professor.html` ao final.
 
-- Visual do aluno mais próximo de uma travessia por ilhas.
-- Fases com sensação de arquipélago e progressão.
-- Mensagens motivacionais de vitória e tentativa.
-- Sorteio automático de questões: você pode cadastrar um banco maior e definir quantas questões o aluno responde por tentativa.
-- Painel do professor preservado para configurar fases, vidas, metas, patentes e questões.
+## Arquivos principais
 
-## Sorteio de questões
-
-Em cada fase, o campo `questionLimit` define quantas questões aparecem na rodada.
-
-Exemplo: se a fase tem 30 questões cadastradas e `questionLimit` é 10, o aluno responde apenas 10 por tentativa. A cada nova tentativa, o sistema embaralha e sorteia outro conjunto do banco da fase.
-
-## Imagens nas questões
-
-Suba a imagem no GitHub junto com os arquivos e use o nome no campo de imagem da questão, por exemplo:
-
-`grafico-calorimetria.png`
-
-## Fórmulas
-
-Aceita HTML simples e LaTeX:
-
-- `H<sub>2</sub>O`
-- `m/s<sup>2</sup>`
-- `\( Q = m \cdot c \cdot \Delta T \)`
+- `index.html`: jogo do aluno.
+- `professor.html`: painel do professor.
+- `settings.json`: configurações da missão, fases, vidas e metas.
+- `questions.json`: banco de questões.
+- `app.js`: lógica do jogo do aluno.
+- `professor.js`: lógica do painel do professor.
+- `style.css`: visual do aluno e professor.
+- `logo-prenat.png`: logo usada no topo.

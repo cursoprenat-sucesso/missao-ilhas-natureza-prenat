@@ -45,6 +45,8 @@
     renderQuestionForm();
     renderQuestionBank();
     setupButtons();
+    setupRichTextHelpers();
+    setupImageTools();
   }
 
   async function fetchJson(url, fallback) {
@@ -133,6 +135,11 @@
       renderQuestionBank();
       alert('questions.json importado.');
     }));
+    document.getElementById('qImage')?.addEventListener('input', updateImagePreview);
+    document.getElementById('clearImageBtn')?.addEventListener('click', () => {
+      setValue('qImage', '');
+      updateImagePreview();
+    });
   }
 
   function populateConfigForm() {
@@ -207,11 +214,12 @@
       card.innerHTML = `
         <div class="phase-editor-head"><h3>Alternativa ${letter}</h3><label><input type="radio" name="correctOption" value="${index}" ${index === 0 ? 'checked' : ''}> Correta</label></div>
         <div class="form-grid" style="margin-top:12px">
-          <div class="form-field full"><label>Texto da alternativa ${letter}</label><textarea id="opt_${index}_text"></textarea></div>
-          <div class="form-field full"><label>Comentário/distrator da alternativa ${letter}</label><textarea id="opt_${index}_feedback" placeholder="Explique por que essa alternativa está certa ou errada."></textarea></div>
+          <div class="form-field full rich-field"><label>Texto da alternativa ${letter}</label><textarea id="opt_${index}_text" data-rich="true"></textarea></div>
+          <div class="form-field full rich-field"><label>Comentário/distrator da alternativa ${letter}</label><textarea id="opt_${index}_feedback" data-rich="true" placeholder="Explique por que essa alternativa está certa ou errada."></textarea></div>
         </div>`;
       options.appendChild(card);
     });
+    setupRichTextHelpers();
   }
 
   function saveQuestionFromForm() {
@@ -258,6 +266,7 @@
     setValue('qDifficulty', q.difficulty);
     setValue('qStatement', q.statement);
     setValue('qImage', q.image);
+    updateImagePreview();
     setValue('qExplanation', q.explanation);
     letters.forEach((_, i) => {
       const op = q.options[i] || { text:'', feedback:'', correct:false };
@@ -285,6 +294,7 @@
       const radio = document.querySelector(`input[name="correctOption"][value="${i}"]`);
       if (radio) radio.checked = i === 0;
     });
+    updateImagePreview();
   }
 
   function renderQuestionBank() {
@@ -315,6 +325,181 @@
     list.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => editQuestion(btn.dataset.edit)));
     list.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => deleteQuestion(btn.dataset.delete)));
   }
+
+
+  function setupRichTextHelpers() {
+    document.querySelectorAll('textarea[data-rich="true"]').forEach(textarea => {
+      if (textarea.dataset.toolbarReady === 'true') return;
+      textarea.dataset.toolbarReady = 'true';
+      const toolbar = document.createElement('div');
+      toolbar.className = 'rich-toolbar';
+      toolbar.innerHTML = `
+        <button type="button" data-rich-action="sub">x<sub>2</sub> Subscrito</button>
+        <button type="button" data-rich-action="sup">x<sup>2</sup> Sobrescrito</button>
+        <button type="button" data-rich-action="latex">Fórmula \( \)</button>
+        <button type="button" data-rich-action="chem">Auto química</button>
+        <button type="button" data-rich-action="arrow">→</button>
+        <button type="button" data-rich-action="equilibrium">⇌</button>
+        <button type="button" data-rich-action="delta">Δ</button>
+      `;
+      textarea.parentElement.insertBefore(toolbar, textarea.nextSibling);
+      toolbar.addEventListener('click', event => {
+        const btn = event.target.closest('button[data-rich-action]');
+        if (!btn) return;
+        applyRichAction(textarea, btn.dataset.richAction);
+      });
+    });
+  }
+
+  function applyRichAction(textarea, action) {
+    textarea.focus();
+    if (action === 'sub') return wrapSelection(textarea, '<sub>', '</sub>', '2');
+    if (action === 'sup') return wrapSelection(textarea, '<sup>', '</sup>', '2');
+    if (action === 'latex') return wrapSelection(textarea, '\\( ', ' \\)', 'Q = m \\cdot c \\cdot \\Delta T');
+    if (action === 'arrow') return insertAtCursor(textarea, ' → ');
+    if (action === 'equilibrium') return insertAtCursor(textarea, ' ⇌ ');
+    if (action === 'delta') return insertAtCursor(textarea, 'Δ');
+    if (action === 'chem') return autoSubscriptChemistry(textarea);
+  }
+
+  function wrapSelection(textarea, before, after, placeholder) {
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    const selected = textarea.value.slice(start, end) || placeholder;
+    const next = textarea.value.slice(0, start) + before + selected + after + textarea.value.slice(end);
+    textarea.value = next;
+    const newStart = start + before.length;
+    const newEnd = newStart + selected.length;
+    textarea.setSelectionRange(newStart, newEnd);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function insertAtCursor(textarea, value) {
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    textarea.value = textarea.value.slice(0, start) + value + textarea.value.slice(end);
+    const pos = start + value.length;
+    textarea.setSelectionRange(pos, pos);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function autoSubscriptChemistry(textarea) {
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const hasSelection = end > start;
+    const original = hasSelection ? textarea.value.slice(start, end) : textarea.value;
+    const converted = convertChemicalNumbers(original);
+    if (hasSelection) {
+      textarea.value = textarea.value.slice(0, start) + converted + textarea.value.slice(end);
+      textarea.setSelectionRange(start, start + converted.length);
+    } else {
+      textarea.value = converted;
+    }
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function convertChemicalNumbers(value) {
+    // Converte números em fórmulas químicas comuns sem mexer em números de etapa, porcentagens ou datas.
+    // Exemplos: H2O -> H<sub>2</sub>O; Na2CO3 -> Na<sub>2</sub>CO<sub>3</sub>; Ca(OH)2 -> Ca(OH)<sub>2</sub>.
+    return String(value || '').replace(/([A-Z][a-z]?|\))([0-9]+)/g, '$1<sub>$2</sub>');
+  }
+
+  function setupImageTools() {
+    const fileInput = document.getElementById('qImageFile');
+    const zone = document.getElementById('imagePasteZone');
+    const imageInput = document.getElementById('qImage');
+    if (fileInput && fileInput.dataset.imageReady !== 'true') {
+      fileInput.dataset.imageReady = 'true';
+      fileInput.addEventListener('change', event => {
+        const file = event.target.files?.[0];
+        if (file) handleImageFile(file);
+        event.target.value = '';
+      });
+    }
+    if (zone && zone.dataset.imageReady !== 'true') {
+      zone.dataset.imageReady = 'true';
+      zone.addEventListener('paste', event => handlePasteImage(event));
+      zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('dragging'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
+      zone.addEventListener('drop', event => {
+        event.preventDefault();
+        zone.classList.remove('dragging');
+        const file = [...(event.dataTransfer?.files || [])].find(item => item.type.startsWith('image/'));
+        if (file) handleImageFile(file);
+      });
+    }
+    if (imageInput && imageInput.dataset.pasteReady !== 'true') {
+      imageInput.dataset.pasteReady = 'true';
+      imageInput.addEventListener('paste', event => handlePasteImage(event));
+    }
+    document.addEventListener('paste', event => {
+      const active = document.activeElement;
+      const isQuestionTabOpen = !document.querySelector('[data-tab="questoes"]')?.classList.contains('hidden');
+      if (!isQuestionTabOpen) return;
+      if (active?.tagName === 'TEXTAREA' && !event.clipboardData?.files?.length) return;
+      handlePasteImage(event);
+    });
+    updateImagePreview();
+  }
+
+  function handlePasteImage(event) {
+    const items = [...(event.clipboardData?.items || [])];
+    const file = items.find(item => item.type.startsWith('image/'))?.getAsFile();
+    if (!file) return;
+    event.preventDefault();
+    handleImageFile(file);
+  }
+
+  async function handleImageFile(file) {
+    if (!file.type.startsWith('image/')) return alert('Escolha um arquivo de imagem.');
+    try {
+      const dataUrl = await imageFileToDataUrl(file, 1200, 0.86);
+      setValue('qImage', dataUrl);
+      updateImagePreview();
+      alert('Imagem adicionada à questão. Ela será salva dentro do questions.json.');
+    } catch (error) {
+      console.error(error);
+      alert('Não consegui carregar essa imagem. Tente PNG ou JPG.');
+    }
+  }
+
+  function imageFileToDataUrl(file, maxSize = 1200, quality = 0.86) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const type = file.type === 'image/png' && file.size < 350000 ? 'image/png' : 'image/jpeg';
+          resolve(canvas.toDataURL(type, quality));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function updateImagePreview() {
+    const value = getValue('qImage').trim();
+    const wrap = document.getElementById('qImagePreviewWrap');
+    const img = document.getElementById('qImagePreview');
+    if (!wrap || !img) return;
+    if (!value) {
+      wrap.classList.add('hidden');
+      img.removeAttribute('src');
+      return;
+    }
+    img.src = value;
+    wrap.classList.remove('hidden');
+  }
+
 
   function downloadJson(filename, data) {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
