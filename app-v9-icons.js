@@ -32,12 +32,12 @@
     const s = Math.max(0, Math.min(6, Number(stage) || 0));
     const title = [
       'Ovo da Travessia',
-      'Filhote do Casco',
-      'Explorador das Marés',
-      'Guardião da Travessia',
-      'Navegador da Resistência',
-      'Mestre da Travessia',
-      'Grande Mestre da Natureza'
+      'Casco Inicial',
+      'Rota das Marés',
+      'Choque de Estratégia',
+      'Escudo da Resistência',
+      'Código da Evolução',
+      'Troféu da Natureza'
     ][s] || 'Patente PRENAT+';
 
     const frame = `
@@ -46,57 +46,70 @@
       <ellipse cx="76" cy="47" rx="38" ry="13" fill="#d7fff9" opacity=".38"/>
     `;
 
-    const turtleColors = {
-      shell: ['#ffffff', '#22b7b1', '#09999f', '#055274', '#d01890', '#0a647a', '#fccc46'][s],
-      shell2: ['#f4fff9', '#7ee4d9', '#63d7d0', '#4db3c2', '#ea7dbe', '#73dce0', '#ffe696'][s],
-      skin: '#16b8af',
-      line: '#4b5a5f'
-    };
+    const drawings = [
+      `
+        ${frame}
+        <g transform="translate(0 0)">
+          <path d="M61 88 L71 74 L81 86 L91 70 L101 86 L112 74 L121 88 L121 111 C121 126 109 137 91 137 C73 137 61 126 61 111 Z" fill="#fffdf7" stroke="#313940" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62 88 l9 -14 l10 12 l10 -16 l10 16 l11 -12 l8 14" fill="none" stroke="#313940" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="82" cy="111" r="4" fill="#e6e1d8"/>
+          <circle cx="96" cy="121" r="5" fill="#e6e1d8"/>
+          <circle cx="103" cy="97" r="3.3" fill="#e6e1d8"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 79)">
+          <path d="M-28 4 q0 -32 28 -32 q28 0 28 32 q0 31 -28 38 q-28 -7 -28 -38Z" fill="#22b7b1" stroke="#4b5a5f" stroke-width="5"/>
+          <path d="M-19 2 q0 -21 19 -21 q19 0 19 21 q0 20 -19 25 q-19 -5 -19 -25Z" fill="#84e5db" opacity=".75"/>
+          <path d="M0 -26 v56 M-25 2 h50" stroke="rgba(5,82,116,.42)" stroke-width="3.2" stroke-linecap="round"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 77)">
+          <circle cx="0" cy="0" r="28" fill="#ffffff" stroke="#4b5a5f" stroke-width="4"/>
+          <circle cx="0" cy="0" r="4" fill="#4b5a5f"/>
+          <path d="M0 -22 L6 0 L0 22 L-6 0 Z" fill="#d01890" stroke="#4b5a5f" stroke-width="2"/>
+          <path d="M22 0 L0 6 L-22 0 L0 -6 Z" fill="#fccc46" stroke="#4b5a5f" stroke-width="2"/>
+          <circle cx="0" cy="0" r="7" fill="#9be5df" stroke="#4b5a5f" stroke-width="2"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 77)">
+          <path d="M6 -30 L-12 -4 H4 L-8 29 L21 -7 H4 Z" fill="#fccc46" stroke="#4b5a5f" stroke-width="5" stroke-linejoin="round"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 78)">
+          <path d="M0 -31 L24 -22 V-2 C24 17 10 29 0 35 C-10 29 -24 17 -24 -2 V-22 Z" fill="#fccc46" stroke="#6d5b2e" stroke-width="4"/>
+          <path d="M0 -18 V16 M-11 -1 H11" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
+          <path d="M-22 -14 L0 -24 L22 -14" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 77)">
+          <path d="M-24 -17 C-7 -35 9 -35 25 -17 C15 -5 13 4 24 17 C8 34 -8 34 -24 17 C-14 5 -13 -6 -24 -17Z" fill="none" stroke="#d01890" stroke-width="5"/>
+          <path d="M-24 17 C-8 34 8 34 24 17" fill="none" stroke="#055274" stroke-width="5"/>
+          <path d="M-24 -17 C-8 -1 8 -1 24 -17" fill="none" stroke="#09999f" stroke-width="5"/>
+          <line x1="-14" y1="-26" x2="-4" y2="28" stroke="#6d5b2e" stroke-width="3"/>
+          <line x1="4" y1="-28" x2="14" y2="26" stroke="#6d5b2e" stroke-width="3"/>
+        </g>
+      `,
+      `
+        ${frame}
+        <g transform="translate(90 76)">
+          <path d="M-16 -22 h32 v20 c0 15 -11 25 -16 28 c-5 -3 -16 -13 -16 -28 z" fill="#fccc46" stroke="#6d5b2e" stroke-width="4"/>
+          <path d="M-16 -14 h-12 c0 12 8 20 18 20 M16 -14 h12 c0 12 -8 20 -18 20" fill="none" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
+          <path d="M0 26 v12 M-16 38 h32" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
+          <path d="M-22 -29 L-12 -42 L0 -30 L12 -42 L22 -29" fill="none" stroke="#d01890" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      `
+    ];
 
-    const tinyTurtle = (x=83, y=78, scale=1, accessory='') => `
-      <g transform="translate(${x} ${y}) scale(${scale})">
-        <ellipse cx="0" cy="10" rx="34" ry="25" fill="${turtleColors.shell}" stroke="${turtleColors.line}" stroke-width="4"/>
-        <path d="M-23 9 q23 -22 46 0 q-23 18 -46 0Z" fill="${turtleColors.shell2}" opacity=".55"/>
-        <path d="M-11 -10 l11 39 M-25 8 h50" stroke="rgba(5,82,116,.42)" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="35" cy="2" r="14" fill="${turtleColors.skin}" stroke="${turtleColors.line}" stroke-width="4"/>
-        <circle cx="40" cy="-2" r="2.8" fill="#17242b"/>
-        <path d="M38 8 q7 5 13 0" stroke="#17242b" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-        <ellipse cx="-24" cy="32" rx="12" ry="6" fill="${turtleColors.skin}" stroke="${turtleColors.line}" stroke-width="3"/>
-        <ellipse cx="10" cy="33" rx="12" ry="6" fill="${turtleColors.skin}" stroke="${turtleColors.line}" stroke-width="3"/>
-        <path d="M-36 12 l-13 7 l13 6" fill="${turtleColors.skin}" stroke="${turtleColors.line}" stroke-width="3" stroke-linejoin="round"/>
-        ${accessory}
-      </g>
-    `;
-
-    const eggHatching = `
-      ${frame}
-      <g transform="translate(0 0)">
-        <path d="M61 87 L69 75 L79 86 L90 72 L100 86 L111 75 L119 88 L119 112 C119 126 107 136 90 136 C73 136 61 126 61 112 Z" fill="#fffdf7" stroke="#313940" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M62 87 l8 -12 l10 11 l10 -14 l10 14 l11 -11 l8 13" fill="none" stroke="#313940" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M81 71 c7 -18 35 -14 38 6 c2 15 -12 25 -27 21" fill="#16b8af" stroke="#4b5a5f" stroke-width="4"/>
-        <circle cx="104" cy="75" r="3" fill="#17242b"/>
-        <path d="M101 85 q6 5 12 0" stroke="#17242b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <circle cx="82" cy="109" r="4" fill="#e9e6df"/>
-        <circle cx="99" cy="123" r="5" fill="#e9e6df"/>
-      </g>
-    `;
-
-    const filhote = `${frame}${tinyTurtle(84, 78, .86, `<path d="M29 -19 q14 -8 28 0" stroke="#fccc46" stroke-width="4" stroke-linecap="round" opacity=".8"/>`)}`;
-    const explorador = `${frame}${tinyTurtle(82, 78, .86, `<circle cx="18" cy="-10" r="10" fill="#fff" stroke="#055274" stroke-width="3"/><path d="M18 -18 l4 9 l-9 4 z" fill="#d01890"/><path d="M35 -14 q13 -4 22 5" stroke="#d01890" stroke-width="5" stroke-linecap="round"/>`)}`;
-    const guardiao = `${frame}${tinyTurtle(82, 78, .86, `<path d="M15 -22 l17 6 v18 c0 12 -9 20 -17 24 c-8 -4 -17 -12 -17 -24 v-18 z" fill="#fccc46" stroke="#6d5b2e" stroke-width="3" opacity=".95"/><path d="M15 -12 v24" stroke="#6d5b2e" stroke-width="3"/><path d="M5 0 h20" stroke="#6d5b2e" stroke-width="3"/>`)}`;
-    const resistencia = `${frame}${tinyTurtle(82, 78, .86, `<path d="M-13 -25 q16 -22 38 0" fill="none" stroke="#d01890" stroke-width="5" stroke-linecap="round"/><circle cx="7" cy="-22" r="6" fill="#fccc46" stroke="#6d5b2e" stroke-width="3"/><path d="M36 -3 q19 4 27 18" stroke="#055274" stroke-width="5" stroke-linecap="round" opacity=".75"/>`)}`;
-    const mestre = `${frame}${tinyTurtle(80, 78, .88, `<path d="M50 17 C79 21 82 47 62 57 C45 44 40 29 30 15 Z" fill="#d01890" opacity=".72"/><path d="M23 -25 L31 -40 L39 -25 L51 -36 L55 -18 L18 -18 Z" fill="#fccc46" stroke="#6d5b2e" stroke-width="3" stroke-linejoin="round"/><circle cx="15" cy="-2" r="8" fill="#fccc46" stroke="#6d5b2e" stroke-width="3"/>`)}`;
-    const grandeMestre = `
-      ${frame}
-      ${tinyTurtle(74, 81, .82, `<path d="M18 -28 L27 -45 L36 -28 L50 -39 L55 -20 L12 -20 Z" fill="#fccc46" stroke="#6d5b2e" stroke-width="3" stroke-linejoin="round"/><path d="M48 18 C80 23 82 51 63 61 C47 48 39 30 29 15 Z" fill="#d01890" opacity=".78"/>`)}
-      <g transform="translate(112 86)">
-        <path d="M-12 -20 h24 v15 c0 12 -9 20 -12 22 c-3 -2 -12 -10 -12 -22 z" fill="#fccc46" stroke="#6d5b2e" stroke-width="4"/>
-        <path d="M-13 -14 h-10 c0 12 7 18 14 18 M13 -14 h10 c0 12 -7 18 -14 18" fill="none" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
-        <path d="M0 18 v12 M-13 30 h26" stroke="#6d5b2e" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    `;
-
-    const drawings = [eggHatching, filhote, explorador, guardiao, resistencia, mestre, grandeMestre];
     return `<svg class="turtle-svg journey-stage-${s} ${mode}" viewBox="0 0 180 150" role="img" aria-label="${escapeHtml(title)}">${drawings[s]}</svg>`;
   }
 

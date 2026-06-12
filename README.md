@@ -1,32 +1,30 @@
-# PRENAT+ | Missão Ilhas da Natureza V9
+# PRENAT+ | Missão Ilhas da Natureza — V7 Tartarugas
 
-Versão com design leve, cards compactos, banco de questões sorteado por rodada e ícones revisados.
+Versão com ícones próprios da evolução da tartaruga: ovo, filhote, exploradora, guardiã, navegadora, mestre e grande mestre.
 
-## Links
+## Links importantes
 
-Aluno:
-https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/
+Depois de publicar no GitHub Pages, use:
 
-Professor:
-https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html
+- Link do aluno: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/`
+- Link do professor: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html`
 
-## Arquivos novos importantes
+## Onde encontrar se perder o link
 
-- `index.html`: tela do aluno.
-- `app-v9-icons.js`: lógica do aluno e novos ícones das fases.
-- `style-v9-icons.css`: estilo do aluno.
-- `professor.html`: painel do professor.
-- `professor.js`: lógica do painel do professor.
-- `settings.json`: nomes, fases, metas, vidas e limites.
-- `questions.json`: banco de questões.
+1. Entre no repositório no GitHub.
+2. Clique em **Settings / Configurações**.
+3. Clique em **Pages / Páginas**.
+4. O GitHub mostra o link publicado do aluno.
+5. Para o professor, use o mesmo link e acrescente `/professor.html`.
 
-## O que mudou
+## O que foi mantido
 
-- Ilha 1: ovo quebrado com tartaruguinha saindo.
-- Ilha 2: filhote/casco.
-- Ilha 3: ícone de exploração/estratégia.
-- Ilha 4: ícone de guardião/resistência.
-- Ilha 5: ícone de evolução.
-- Boss Final: Grande Mestre com troféu/coroa.
+- Banco de questões sorteado por tentativa.
+- Professor separado do aluno.
+- Imagem por upload, arrastar ou Ctrl+V.
+- Subscrito, sobrescrito, fórmula e Auto Química no professor.
+- Flow motivacional ao vencer ou tentar novamente.
 
-As questões continuam sendo sorteadas do banco de cada ilha.
+
+## V8 Tartarugas Cachefix
+Esta versão força o navegador a carregar novos arquivos: `app-tartarugas-v8.js` e `style-tartarugas-v8.css`. Assim os ícones antigos não ficam presos no cache.

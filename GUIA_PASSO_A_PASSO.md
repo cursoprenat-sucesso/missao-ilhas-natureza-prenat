@@ -1,31 +1,26 @@
-# Guia rápido da V9
+# Guia rápido — PRENAT+ V7
 
-## Para atualizar no GitHub
+## Links
 
-1. Entre no repositório `missao-ilhas-natureza-prenat`.
-2. Clique em `Add file > Upload files`.
-3. Arraste todos os arquivos desta pasta.
-4. Clique em `Commit changes`.
-5. Abra o link do aluno com `?v=9` no final e use `Ctrl + F5`.
+- Aluno: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/`
+- Professor: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html`
 
-## Arquivos que precisam subir
+## Se perder o link
 
-- app-v9-icons.js
-- style-v9-icons.css
-- index.html
-- logo-prenat.png
-- professor.html
-- professor.js
-- questions.json
-- settings.json
-- style.css
-- README.md
-- GUIA_PASSO_A_PASSO.md
-- LINKS_DO_JOGO.md
+No GitHub: repositório → **Settings / Configurações** → **Pages / Páginas**. O link publicado aparece nessa tela. O professor fica no mesmo endereço, acrescentando `/professor.html`.
 
-## Ajuste de cache
+## Para atualizar o jogo
 
-Abra:
-https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/?v=9
+1. Abra `professor.html`.
+2. Cadastre ou edite questões.
+3. Baixe `questions.json` e/ou `settings.json`.
+4. No GitHub, envie o arquivo atualizado com **Add file → Upload files**.
+5. Aguarde o GitHub Pages atualizar.
 
-Depois aperte Ctrl + F5.
+## Imagens
+
+No campo de imagem da questão, você pode escolher arquivo, arrastar ou colar com Ctrl+V. A imagem fica incorporada ao `questions.json`.
+
+## Fórmulas
+
+Use os botões do editor: x₂, x², fórmula, Auto Química, →, ⇌ e Δ.
