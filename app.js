@@ -1,33 +1,78 @@
 (() => {
   const app = document.getElementById('app');
   const letters = ['A', 'B', 'C', 'D', 'E'];
-  const islandIcons = ['🥚', '🐣', '🧭', '🌿', '🧬', '🏆'];
   let settings = null;
   let questions = [];
   let progress = null;
   let currentRun = null;
 
   const DEFAULT_SETTINGS = {
-    slug: 'missao-ilhas-natureza-prenat-v3-flow',
+    slug: 'missao-ilhas-natureza-prenat-v7-tartarugas',
     brand: 'PRENAT+',
     missionName: 'Missão Ilhas da Natureza',
     missionKicker: 'CAMPO DE TREINO PRENAT+',
-    subtitle: 'Uma travessia estratégica com desafios progressivos de Ciências da Natureza.',
-    intro: 'Avance pelo arquipélago, vença ilhas, conquiste patentes e treine Biologia, Física e Química em uma mesma jornada.',
+    subtitle: 'Uma travessia leve e estratégica com desafios progressivos de Ciências da Natureza.',
+    intro: 'Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e evoluir de ovo a mestre da travessia.',
     studentThemeNote: 'Cada tentativa sorteia questões do banco da ilha. Volte, tente de novo e construa sua evolução passo a passo.',
     showMetaToStudent: false,
     logo: 'logo-prenat.png',
     ranks: [
-      { name:'Ovo da Travessia', icon:'🥚', description:'Todo grande percurso começa protegido pela casca. A missão está pronta para começar.' },
-      { name:'Filhote do Casco', icon:'🐣', description:'Você rompeu a primeira casca e deu o primeiro passo no arquipélago PRENAT+.' },
-      { name:'Explorador das Marés', icon:'🌊', description:'Você já reconhece padrões, atravessa conceitos básicos e mantém a rota.' },
-      { name:'Guardião da Energia', icon:'⚡', description:'Você sustenta o ritmo diante de questões médias e armadilhas conceituais.' },
-      { name:'Navegador da Vida', icon:'🌱', description:'Você conecta dados, fenômenos, cotidiano e interpretação científica.' },
-      { name:'Mestre da Evolução', icon:'🧬', description:'Você venceu etapas densas e aprendeu a eliminar distratores fortes.' },
-      { name:'Grande Mestre da Natureza', icon:'🏆', description:'Você completou a travessia e venceu o Boss Final da missão PRENAT+.' }
+      { name:'Ovo da Travessia', icon:'🥚', visualStage:0, description:'Você ainda está no início da jornada. A casca protege sua preparação antes da primeira ilha.' },
+      { name:'Filhote do Casco', icon:'🐢', visualStage:1, description:'Você saiu do ovo, rompeu a primeira casca e virou Filhote do Casco.' },
+      { name:'Explorador das Marés', icon:'🐢', visualStage:2, description:'Você já encara a travessia com mais segurança e começa a reconhecer os caminhos da prova.' },
+      { name:'Guardião da Travessia', icon:'🐢', visualStage:3, description:'Você sustenta o foco diante de armadilhas, gráficos e alternativas parecidas.' },
+      { name:'Navegador da Resistência', icon:'🐢', visualStage:4, description:'Você atravessa questões maiores, interpreta dados e mantém calma até o fim.' },
+      { name:'Mestre da Travessia', icon:'🐢', visualStage:5, description:'Você domina etapas exigentes, elimina distratores fortes e conduz a própria evolução.' },
+      { name:'Grande Mestre da Natureza', icon:'🐢', visualStage:6, description:'Você venceu o Boss Final e concluiu a travessia PRENAT+ como Grande Mestre da Natureza.' }
     ],
     phases: []
   };
+
+  function turtleBadgeSvg(stage = 0, mode = 'island') {
+    const s = Math.max(0, Math.min(6, Number(stage) || 0));
+    const shell = ['#fdf9ec', '#09999f', '#0aa7a6', '#055274', '#d01890', '#0b6979', '#fccc46'][s];
+    const shell2 = ['#ffffff', '#64d8cf', '#71ded3', '#2a8aa0', '#e86ab4', '#5bc7ca', '#ffe08a'][s];
+    const cape = s >= 5 ? `<path d="M90 82 C116 82 125 102 115 118 C98 111 87 101 79 88 Z" fill="#d01890" opacity="0.78"/>` : '';
+    const crown = s === 6 ? `<path d="M72 34 L80 20 L90 34 L102 22 L108 40 L68 40 Z" fill="#fccc46" stroke="#6d5b2e" stroke-width="4" stroke-linejoin="round"/>` : '';
+    const medal = s >= 4 ? `<circle cx="88" cy="80" r="9" fill="#fccc46" stroke="#6d5b2e" stroke-width="3"/><path d="M84 79 h8" stroke="#6d5b2e" stroke-width="3"/>` : '';
+    const bandana = s === 3 ? `<path d="M95 55 q14 -2 23 6" stroke="#d01890" stroke-width="6" stroke-linecap="round"/><path d="M113 60 l14 -8 l-5 15 z" fill="#d01890"/>` : '';
+    const compass = s === 2 ? `<circle cx="92" cy="77" r="10" fill="#fff" stroke="#055274" stroke-width="3"/><path d="M92 68 l4 9 l-9 4 z" fill="#d01890"/>` : '';
+    const egg = s === 0 ? `<g class="egg-shell"><ellipse cx="86" cy="82" rx="27" ry="34" fill="#fffdf7" stroke="#313940" stroke-width="5"/><path d="M63 81 l10 -8 l8 9 l8 -9 l9 9 l10 -8 l6 12" fill="none" stroke="#313940" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="88" r="4" fill="#e9e6df"/><circle cx="94" cy="101" r="5" fill="#e9e6df"/></g>` : '';
+    const babyHead = s === 1 ? `<circle cx="112" cy="72" r="18" fill="#18b8b0" stroke="#4b5a5f" stroke-width="4"/>` : `<circle cx="112" cy="69" r="18" fill="#18b8b0" stroke="#4b5a5f" stroke-width="4"/>`;
+    if (s === 0) {
+      return `<svg class="turtle-svg turtle-stage-${s} ${mode}" viewBox="0 0 180 150" role="img" aria-label="Ovo da Travessia"><ellipse cx="90" cy="128" rx="58" ry="14" fill="#d6ad6c" opacity=".9"/><circle cx="90" cy="70" r="54" fill="#9be5df" opacity=".82"/><path d="M92 54 c13 -18 39 -8 36 14 c-2 17 -20 25 -36 18" fill="#18b8b0" stroke="#4b5a5f" stroke-width="4"/><circle cx="109" cy="58" r="3" fill="#17242b"/>${egg}</svg>`;
+    }
+    return `<svg class="turtle-svg turtle-stage-${s} ${mode}" viewBox="0 0 180 150" role="img" aria-label="Tartaruga estágio ${s}">
+      <ellipse cx="90" cy="130" rx="62" ry="13" fill="#d6ad6c" opacity=".9"/>
+      <circle cx="90" cy="74" r="55" fill="#9be5df" opacity=".78"/>
+      ${cape}
+      <ellipse cx="78" cy="84" rx="44" ry="34" fill="${shell}" stroke="#4b5a5f" stroke-width="4"/>
+      <path d="M45 82 q33 -34 67 0 q-33 28 -67 0Z" fill="${shell2}" opacity=".52"/>
+      <path d="M67 56 l13 55 M51 77 h58" stroke="rgba(5,82,116,.45)" stroke-width="3" stroke-linecap="round"/>
+      ${babyHead}
+      <circle cx="117" cy="64" r="3.2" fill="#17242b"/>
+      <path d="M115 76 q8 7 16 0" stroke="#17242b" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="51" cy="111" rx="15" ry="8" fill="#18b8b0" stroke="#4b5a5f" stroke-width="3"/>
+      <ellipse cx="91" cy="113" rx="15" ry="8" fill="#18b8b0" stroke="#4b5a5f" stroke-width="3"/>
+      <path d="M33 88 l-17 9 l17 7" fill="#18b8b0" stroke="#4b5a5f" stroke-width="3" stroke-linejoin="round"/>
+      ${bandana}${compass}${medal}${crown}
+    </svg>`;
+  }
+
+  function rankStage(rank, fallback = 0) {
+    return Number(rank?.visualStage ?? fallback) || 0;
+  }
+
+  function buildVictoryMessage(phase, previousRank, nextRank) {
+    const next = nextRank?.name || 'nova patente';
+    if (rankStage(nextRank) === 1) {
+      return `Sucesso! Você venceu ${phase.title}, saiu do ovo e agora é ${next}. A primeira ilha foi conquistada; siga com calma para a próxima travessia.`;
+    }
+    if (rankStage(nextRank) >= 6) {
+      return `Travessia completa! Você venceu ${phase.title} e alcançou a patente ${next}. O Boss Final ficou para trás: sua evolução em Ciências da Natureza está registrada.`;
+    }
+    return `Sucesso! Você venceu ${phase.title} e evoluiu de ${previousRank?.name || 'sua patente anterior'} para ${next}. Uma nova ilha foi aberta para você continuar a travessia.`;
+  }
 
   document.getElementById('resetProgress')?.addEventListener('click', () => {
     if (!settings) return;
@@ -80,6 +125,7 @@
       rewardRankIndex: Number(phase.rewardRankIndex ?? Math.min(index + 1, settings.ranks.length - 1)),
       difficultyLabel: phase.difficultyLabel || 'Treino'
     })) : [];
+    settings.ranks = settings.ranks.map((rank, index) => ({ ...rank, visualStage: Number(rank.visualStage ?? index) }));
     questions = Array.isArray(questions) ? questions.map((q, index) => normalizeQuestion(q, index)) : [];
   }
 
@@ -172,7 +218,8 @@
     const nextPhase = settings.phases.find(p => !progress.completedPhases.includes(p.id));
     const nextRank = nextPhase ? settings.ranks[nextPhase.rewardRankIndex] : null;
 
-    app.querySelector('[data-rank-icon]').textContent = rank.icon || '🥚';
+    const rankIcon = app.querySelector('[data-rank-icon]');
+    if (rankIcon) rankIcon.innerHTML = turtleBadgeSvg(rankStage(rank, progress.rankIndex || 0), 'rank');
     app.querySelector('[data-rank-name]').textContent = rank.name || 'Patente inicial';
     app.querySelector('[data-rank-description]').textContent = rank.description || '';
     app.querySelector('[data-progress-text]').textContent = `${percent}%`;
@@ -195,15 +242,14 @@
       const phaseQuestions = getQuestionsForPhase(phase.id);
       const playableCount = getPlayableCount(phase, phaseQuestions.length);
       const rank = settings.ranks[phase.rewardRankIndex] || {};
-      const icon = index === settings.phases.length - 1 ? '🏆' : (rank.icon || islandIcons[index] || '🏝️');
+      const visualStage = rankStage(rank, index + 1);
       const card = document.createElement('article');
       card.className = `island-card ${unlocked ? '' : 'locked'} ${completed ? 'completed' : ''}`;
       card.innerHTML = `
         ${completed ? '<span class="completed-ribbon">CONQUISTADA</span>' : ''}
         <span class="lock-badge">${completed ? '✓' : unlocked ? 'Aberta' : '🔒'}</span>
         <div class="island-art">
-          <div class="island-orb"></div>
-          <div class="island-icon">${icon}</div>
+          <div class="turtle-medal island-turtle">${turtleBadgeSvg(visualStage, 'island')}</div>
         </div>
         <div class="island-card-body">
           <span class="tiny-label">${escapeHtml(phase.name)}</span>
@@ -374,18 +420,19 @@
     const template = document.getElementById('resultTemplate').content.cloneNode(true);
     app.innerHTML = '';
     app.appendChild(template);
-    app.querySelector('[data-result-icon]').textContent = passed ? (nextRank.icon || '🏆') : '🌊';
+    const resultIcon = app.querySelector('[data-result-icon]');
+    if (resultIcon) resultIcon.innerHTML = turtleBadgeSvg(passed ? rankStage(nextRank, run.phase.rewardRankIndex) : rankStage(previousRank, progress.rankIndex || 0), 'result');
     app.querySelector('[data-result-kicker]').textContent = passed ? 'Ilha conquistada' : 'Travessia em treinamento';
     app.querySelector('[data-result-title]').textContent = passed ? 'Você venceu esta ilha!' : 'Ainda não foi dessa vez.';
     app.querySelector('[data-result-message]').textContent = passed
-      ? `Sucesso! Você venceu ${run.phase.title}, abriu uma nova ilha e conquistou a patente ${nextRank.name}. Continue: a próxima etapa já está esperando por você.`
-      : `Você fez ${percent}% e precisava de ${run.phase.minPercent}%. Isso não é fim de jornada: é ajuste de rota. Tente novamente; uma nova rodada será sorteada do banco desta ilha.`;
+      ? buildVictoryMessage(run.phase, previousRank, nextRank)
+      : `Ainda não foi dessa vez. Você fez ${percent}% e precisava de ${run.phase.minPercent}%. Isso não é fim da jornada: é ajuste de rota. Respire, tente novamente e lembre que uma nova rodada será sorteada do banco desta ilha.`;
     app.querySelector('[data-result-score]').textContent = `${run.score}/${run.questions.length}`;
     app.querySelector('[data-result-percent]').textContent = `${percent}%`;
     app.querySelector('[data-result-target]').textContent = `${run.phase.minPercent}%`;
     app.querySelector('[data-rank-unlock]').innerHTML = passed
       ? `<span class="tiny-label">Nova patente desbloqueada</span><br><strong>${escapeHtml(previousRank.name)} → ${escapeHtml(nextRank.name)}</strong><p>${escapeHtml(nextRank.description || '')}</p>`
-      : `<strong>Patente ainda bloqueada:</strong> vença esta ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}. Você pode tentar novamente quantas vezes precisar.`;
+      : `<strong>Patente ainda bloqueada:</strong> vença esta ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}. Você pode tentar novamente quantas vezes precisar: cada tentativa também é treino.`;
 
     const mainButton = app.querySelector('[data-action="result-main"]');
     mainButton.textContent = passed ? 'Seguir para a próxima ilha' : 'Tentar uma nova rodada';

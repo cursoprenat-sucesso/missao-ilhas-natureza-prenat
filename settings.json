@@ -1,10 +1,10 @@
 {
-  "slug": "missao-ilhas-natureza-prenat-v6",
+  "slug": "missao-ilhas-natureza-prenat-v7-tartarugas",
   "brand": "PRENAT+",
   "missionName": "Missão Ilhas da Natureza",
   "missionKicker": "CAMPO DE TREINO PRENAT+",
-  "subtitle": "Uma travessia leve, estratégica e progressiva em Ciências da Natureza.",
-  "intro": "Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e desbloquear novas patentes a cada conquista.",
+  "subtitle": "Uma travessia leve e estratégica com desafios progressivos de Ciências da Natureza.",
+  "intro": "Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e evoluir de ovo a mestre da travessia.",
   "studentThemeNote": "Cada rodada sorteia questões do banco da ilha. Tente novamente quando precisar: o treino muda, e sua estratégia melhora.",
   "showMetaToStudent": false,
   "logo": "logo-prenat.png",
@@ -12,37 +12,44 @@
     {
       "name": "Ovo da Travessia",
       "icon": "🥚",
-      "description": "A jornada começou. Prepare a mente, proteja a calma e entre na primeira ilha."
+      "visualStage": 0,
+      "description": "Você ainda está no início da jornada. A casca protege sua preparação antes da primeira ilha."
     },
     {
       "name": "Filhote do Casco",
-      "icon": "🐣",
-      "description": "Você rompeu a casca inicial e deu o primeiro passo no arquipélago PRENAT+."
+      "icon": "🐢",
+      "visualStage": 1,
+      "description": "Você saiu do ovo, rompeu a primeira casca e virou Filhote do Casco."
     },
     {
       "name": "Explorador das Marés",
-      "icon": "🌊",
-      "description": "Você começou a reconhecer padrões e atravessar desafios com mais segurança."
+      "icon": "🐢",
+      "visualStage": 2,
+      "description": "Você já encara a travessia com mais segurança e começa a reconhecer os caminhos da prova."
     },
     {
-      "name": "Guardião da Energia",
-      "icon": "⚡",
-      "description": "Você manteve o ritmo diante de questões médias e armadilhas conceituais."
+      "name": "Guardião da Travessia",
+      "icon": "🐢",
+      "visualStage": 3,
+      "description": "Você sustenta o foco diante de armadilhas, gráficos e alternativas parecidas."
     },
     {
-      "name": "Navegador da Vida",
-      "icon": "🌱",
-      "description": "Você conectou dados, fenômenos, cotidiano e interpretação científica."
+      "name": "Navegador da Resistência",
+      "icon": "🐢",
+      "visualStage": 4,
+      "description": "Você atravessa questões maiores, interpreta dados e mantém calma até o fim."
     },
     {
-      "name": "Mestre da Evolução",
-      "icon": "🧬",
-      "description": "Você enfrentou questões profundas e aprendeu a eliminar distratores fortes."
+      "name": "Mestre da Travessia",
+      "icon": "🐢",
+      "visualStage": 5,
+      "description": "Você domina etapas exigentes, elimina distratores fortes e conduz a própria evolução."
     },
     {
       "name": "Grande Mestre da Natureza",
-      "icon": "🏆",
-      "description": "Você venceu o Boss Final e concluiu a travessia PRENAT+."
+      "icon": "🐢",
+      "visualStage": 6,
+      "description": "Você venceu o Boss Final e concluiu a travessia PRENAT+ como Grande Mestre da Natureza."
     }
   ],
   "phases": [
@@ -50,7 +57,7 @@
       "id": 1,
       "name": "Ilha 1",
       "title": "Rompendo a Casca",
-      "story": "Nesta primeira ilha, você vai aquecer a mente com questões básicas e misturadas de Natureza. Para avançar, mantenha o foco e supere a meta.",
+      "story": "Nesta primeira ilha, você vai aquecer a mente com questões básicas e misturadas de Natureza. Para avançar, mantenha o foco, proteja suas vidas e supere a meta.",
       "minPercent": 60,
       "lives": 3,
       "questionLimit": 10,

@@ -20,3 +20,59 @@
 .teacher-shell{width:min(1240px,calc(100% - 32px));margin:22px auto 70px}.teacher-hero{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:28px}.teacher-hero h1{margin:0;color:var(--azul-profundo);font-size:2.15rem;letter-spacing:-.045em}.teacher-hero p{margin:8px 0 0;color:var(--muted)}.teacher-grid{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-top:20px}.teacher-menu{padding:16px;align-self:start;position:sticky;top:90px}.teacher-menu button{width:100%;justify-content:flex-start;margin:6px 0}.teacher-panel{padding:28px}.teacher-panel h2{margin:0 0 10px;color:var(--azul-profundo);font-size:1.85rem}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.form-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.form-field{display:flex;flex-direction:column;gap:6px}.form-field.full{grid-column:1/-1}.form-field label{font-weight:900;color:#315465;font-size:.84rem}.form-field input,.form-field textarea,.form-field select{border:1px solid var(--line);border-radius:15px;padding:12px 13px;background:#fff;color:var(--texto);outline:none}.form-field textarea{min-height:96px;resize:vertical}.phase-editor-card,.question-row{border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;margin:12px 0}.phase-editor-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.phase-editor-head h3{margin:0;color:var(--azul-profundo)}.teacher-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.question-bank-list{display:grid;gap:10px;max-height:560px;overflow:auto;padding-right:6px}.question-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.question-row strong{color:var(--azul-profundo)}.question-row small{display:block;color:var(--muted);margin-top:4px}.danger{color:#b42222;background:#fff2f2;border:1px solid #ffd2d2}.success-tip{padding:14px 16px;border-radius:16px;background:#eefbf3;border:1px solid #c9efd9;color:#245f3f;font-weight:800;line-height:1.45}.warning-tip{padding:14px 16px;border-radius:16px;background:#fff8e3;border:1px solid rgba(252,204,70,.55);color:#665124;font-weight:800;line-height:1.45}.code-box{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#0f3141;color:#e8ffff;border-radius:16px;padding:14px;overflow:auto;line-height:1.5}.rich-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 10px}.rich-toolbar button{border:1px solid var(--line);background:#fff;color:var(--azul-profundo);border-radius:999px;padding:8px 11px;font-weight:900;font-size:.76rem;cursor:pointer;box-shadow:0 8px 18px rgba(5,82,116,.05)}.rich-toolbar button:hover{border-color:rgba(9,153,159,.55)}.image-tools{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}.file-label{cursor:pointer}.image-paste-zone{border:2px dashed rgba(9,153,159,.42);border-radius:20px;background:linear-gradient(180deg,#fbffff,#f2fcfd);padding:16px;text-align:center;color:#315465;display:grid;gap:6px;outline:none;transition:.16s;cursor:copy}.image-paste-zone strong{color:var(--azul-profundo)}.image-paste-zone span{font-size:.88rem;color:var(--muted);font-weight:700}.image-paste-zone:focus,.image-paste-zone.dragging{border-color:var(--magenta);box-shadow:0 0 0 5px rgba(208,24,144,.08);background:#fff}.image-preview{margin-top:12px;border:1px solid var(--line);border-radius:20px;padding:12px;background:#fff;box-shadow:0 12px 28px rgba(5,82,116,.08)}.image-preview img{display:block;width:100%;max-height:320px;object-fit:contain;border-radius:14px;background:#fff}
 @media(max-width:1050px){.hero-flow,.quiz-layout,.teacher-grid{grid-template-columns:1fr}.quiz-sidebar,.teacher-menu{position:static}.archipelago-board{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{align-items:flex-start;gap:12px;flex-direction:column}.result-stats{grid-template-columns:1fr}.form-grid,.form-grid.three{grid-template-columns:1fr}}
 @media(max-width:680px){.app-shell{width:min(100% - 18px,1180px);margin-top:22px}.mission-gate,.rank-panel,.map-card,.question-card,.quiz-sidebar{padding:20px}.mission-gate h1{font-size:2.6rem}.archipelago-board{grid-template-columns:1fr}.island-card{min-height:auto}.section-title-row{display:block}.btn{width:100%;justify-content:center}.topbar .btn{width:auto}.question-card h1{font-size:1.08rem}.option-btn{font-size:.88rem}.mission-logo-img{width:70px;height:70px}}
+
+
+/* V7 — ícones próprios da tartaruga PRENAT+ */
+.turtle-medal,
+.rank-orb.premium-medal,
+.result-icon.premium-medal{
+  background: radial-gradient(circle at 28% 18%, rgba(255,255,255,.9) 0 8%, rgba(255,255,255,.28) 9% 22%, transparent 23%), linear-gradient(145deg, #d9fbf8, #09999f);
+  overflow:hidden;
+  color:inherit;
+  text-shadow:none;
+}
+.rank-orb.premium-medal,
+.result-icon.premium-medal{
+  border-radius:34px;
+  padding:8px;
+}
+.rank-orb .turtle-svg,
+.result-icon .turtle-svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+.turtle-medal.island-turtle{
+  width:112px;
+  height:92px;
+  display:grid;
+  place-items:center;
+  margin:0 auto;
+  border-radius:28px;
+  background:transparent;
+  box-shadow:none;
+}
+.turtle-svg{
+  width:100%;
+  height:100%;
+  display:block;
+  filter: drop-shadow(0 8px 10px rgba(5,82,116,.16));
+}
+.island-art{
+  height:102px;
+  margin-bottom:6px;
+}
+.result-icon.premium-medal{
+  width:132px;
+  height:116px;
+  font-size:initial;
+}
+.rank-orb.premium-medal{
+  width:132px;
+  height:116px;
+  font-size:initial;
+}
+.turtle-stage-6 .result,
+.turtle-stage-6.result{
+  filter: drop-shadow(0 10px 12px rgba(208,24,144,.18));
+}
