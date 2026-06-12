@@ -34,3 +34,7 @@ Esta versão força o navegador a carregar novos arquivos: `app-tartarugas-v8.js
 - Ícone do Boss Final ajustado com composição de **troféu + predador**.
 - Painel do professor com seleção de **fonte do texto** e **fonte dos títulos** do aluno.
 - Mantido todo o restante do fluxo do professor e do aluno.
+
+
+## V12 Final Anti-cache
+Use esta versão quando o navegador/GitHub Pages não mostrar as mudanças. O aluno carrega `app-v12-final.js` e `style-v12-final.css`. O professor carrega `professor-v12-final.js`.
