@@ -1,11 +1,11 @@
 {
-  "slug": "missao-ilhas-natureza-prenat-v7-tartarugas",
+  "slug": "missao-ilhas-natureza-prenat-v9-icones-flow",
   "brand": "PRENAT+",
   "missionName": "Missão Ilhas da Natureza",
   "missionKicker": "CAMPO DE TREINO PRENAT+",
-  "subtitle": "Uma travessia leve e estratégica com desafios progressivos de Ciências da Natureza.",
-  "intro": "Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e evoluir de ovo a mestre da travessia.",
-  "studentThemeNote": "Cada rodada sorteia questões do banco da ilha. Tente novamente quando precisar: o treino muda, e sua estratégia melhora.",
+  "subtitle": "Uma travessia leve, estratégica e progressiva de Ciências da Natureza.",
+  "intro": "Você vai atravessar ilhas, vencer rodadas sorteadas do banco de questões e evoluir do ovo ao Grande Mestre da Natureza.",
+  "studentThemeNote": "Escolha sua próxima ilha. A cada tentativa, a rodada pode mudar: o jogo sorteia perguntas do banco e mantém o desafio vivo.",
   "showMetaToStudent": false,
   "logo": "logo-prenat.png",
   "ranks": [
@@ -63,7 +63,8 @@
       "questionLimit": 10,
       "shuffle": true,
       "rewardRankIndex": 1,
-      "difficultyLabel": "Aquecimento"
+      "difficultyLabel": "Aquecimento",
+      "iconStage": 0
     },
     {
       "id": 2,
@@ -71,11 +72,12 @@
       "title": "Caminho do Filhote",
       "story": "Nesta ilha, você vai enfrentar enunciados um pouco mais interpretativos, alternativas parecidas e conceitos que pedem atenção.",
       "minPercent": 65,
-      "lives": 3,
+      "lives": 4,
       "questionLimit": 15,
       "shuffle": true,
       "rewardRankIndex": 2,
-      "difficultyLabel": "Base + interpretação"
+      "difficultyLabel": "Base + interpretação",
+      "iconStage": 1
     },
     {
       "id": 3,
@@ -83,11 +85,12 @@
       "title": "Mar das Estratégias",
       "story": "Agora você vai cruzar gráficos, comparações, contextos do cotidiano e armadilhas típicas de prova.",
       "minPercent": 70,
-      "lives": 3,
+      "lives": 5,
       "questionLimit": 20,
       "shuffle": true,
       "rewardRankIndex": 3,
-      "difficultyLabel": "Intermediário"
+      "difficultyLabel": "Intermediário",
+      "iconStage": 2
     },
     {
       "id": 4,
@@ -95,11 +98,12 @@
       "title": "Trilha da Resistência",
       "story": "Aqui a resistência aumenta: você vai lidar com textos maiores, ideias combinadas e decisões que exigem calma até o fim.",
       "minPercent": 75,
-      "lives": 3,
-      "questionLimit": 30,
+      "lives": 6,
+      "questionLimit": 25,
       "shuffle": true,
       "rewardRankIndex": 4,
-      "difficultyLabel": "Médio-forte"
+      "difficultyLabel": "Médio-forte",
+      "iconStage": 3
     },
     {
       "id": 5,
@@ -107,11 +111,12 @@
       "title": "Templo da Evolução",
       "story": "Nesta ilha, você vai encarar questões mais profundas, distratores fortes e raciocínio mais exigente.",
       "minPercent": 80,
-      "lives": 4,
-      "questionLimit": 35,
+      "lives": 7,
+      "questionLimit": 30,
       "shuffle": true,
       "rewardRankIndex": 5,
-      "difficultyLabel": "Avançado"
+      "difficultyLabel": "Avançado",
+      "iconStage": 4
     },
     {
       "id": 6,
@@ -119,11 +124,12 @@
       "title": "Grande Batalha da Natureza",
       "story": "Chegou o Boss Final. Você vai enfrentar questões hard, integradas e com cara de prova. Supere a meta final e conclua a travessia.",
       "minPercent": 80,
-      "lives": 4,
+      "lives": 9,
       "questionLimit": 45,
       "shuffle": true,
       "rewardRankIndex": 6,
-      "difficultyLabel": "Hard final"
+      "difficultyLabel": "Hard final",
+      "iconStage": 6
     }
   ]
 }

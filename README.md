@@ -1,26 +1,32 @@
-# PRENAT+ | Missão Ilhas da Natureza — V7 Tartarugas
+# PRENAT+ | Missão Ilhas da Natureza V9
 
-Versão com ícones próprios da evolução da tartaruga: ovo, filhote, exploradora, guardiã, navegadora, mestre e grande mestre.
+Versão com design leve, cards compactos, banco de questões sorteado por rodada e ícones revisados.
 
-## Links importantes
+## Links
 
-Depois de publicar no GitHub Pages, use:
+Aluno:
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/
 
-- Link do aluno: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/`
-- Link do professor: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html`
+Professor:
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html
 
-## Onde encontrar se perder o link
+## Arquivos novos importantes
 
-1. Entre no repositório no GitHub.
-2. Clique em **Settings / Configurações**.
-3. Clique em **Pages / Páginas**.
-4. O GitHub mostra o link publicado do aluno.
-5. Para o professor, use o mesmo link e acrescente `/professor.html`.
+- `index.html`: tela do aluno.
+- `app-v9-icons.js`: lógica do aluno e novos ícones das fases.
+- `style-v9-icons.css`: estilo do aluno.
+- `professor.html`: painel do professor.
+- `professor.js`: lógica do painel do professor.
+- `settings.json`: nomes, fases, metas, vidas e limites.
+- `questions.json`: banco de questões.
 
-## O que foi mantido
+## O que mudou
 
-- Banco de questões sorteado por tentativa.
-- Professor separado do aluno.
-- Imagem por upload, arrastar ou Ctrl+V.
-- Subscrito, sobrescrito, fórmula e Auto Química no professor.
-- Flow motivacional ao vencer ou tentar novamente.
+- Ilha 1: ovo quebrado com tartaruguinha saindo.
+- Ilha 2: filhote/casco.
+- Ilha 3: ícone de exploração/estratégia.
+- Ilha 4: ícone de guardião/resistência.
+- Ilha 5: ícone de evolução.
+- Boss Final: Grande Mestre com troféu/coroa.
+
+As questões continuam sendo sorteadas do banco de cada ilha.

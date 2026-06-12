@@ -1,26 +1,15 @@
-# PRENAT+ | Missão Ilhas da Natureza — V7 Tartarugas
+# Links da Missão Ilhas da Natureza
 
-Versão com ícones próprios da evolução da tartaruga: ovo, filhote, exploradora, guardiã, navegadora, mestre e grande mestre.
+## Link do aluno
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/
 
-## Links importantes
+## Link do professor
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html
 
-Depois de publicar no GitHub Pages, use:
+## Onde encontrar esses links no GitHub
 
-- Link do aluno: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/`
-- Link do professor: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html`
-
-## Onde encontrar se perder o link
-
-1. Entre no repositório no GitHub.
-2. Clique em **Settings / Configurações**.
-3. Clique em **Pages / Páginas**.
+1. Entre no repositório `missao-ilhas-natureza-prenat`.
+2. Clique em `Settings` ou `Configurações`.
+3. Clique em `Pages` ou `Páginas`.
 4. O GitHub mostra o link publicado do aluno.
-5. Para o professor, use o mesmo link e acrescente `/professor.html`.
-
-## O que foi mantido
-
-- Banco de questões sorteado por tentativa.
-- Professor separado do aluno.
-- Imagem por upload, arrastar ou Ctrl+V.
-- Subscrito, sobrescrito, fórmula e Auto Química no professor.
-- Flow motivacional ao vencer ou tentar novamente.
+5. Para abrir o professor, acrescente `/professor.html` no final do link.
