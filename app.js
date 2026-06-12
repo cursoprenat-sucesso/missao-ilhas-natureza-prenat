@@ -1,29 +1,30 @@
 (() => {
   const app = document.getElementById('app');
   const letters = ['A', 'B', 'C', 'D', 'E'];
+  const islandIcons = ['🥚', '🐣', '🧭', '🌿', '🧬', '🏆'];
   let settings = null;
   let questions = [];
   let progress = null;
   let currentRun = null;
 
   const DEFAULT_SETTINGS = {
-    slug: 'missao-ilhas-natureza-prenat-v2',
+    slug: 'missao-ilhas-natureza-prenat-v3-flow',
     brand: 'PRENAT+',
     missionName: 'Missão Ilhas da Natureza',
     missionKicker: 'CAMPO DE TREINO PRENAT+',
-    subtitle: 'Uma jornada RPG com questões misturadas de Biologia, Física e Química.',
-    intro: 'Atravesse o arquipélago, conquiste patentes e prove que domina Ciências da Natureza.',
-    studentThemeNote: 'As questões misturam Biologia, Física e Química. As etiquetas são internas do professor.',
+    subtitle: 'Uma travessia estratégica com desafios progressivos de Ciências da Natureza.',
+    intro: 'Avance pelo arquipélago, vença ilhas, conquiste patentes e treine Biologia, Física e Química em uma mesma jornada.',
+    studentThemeNote: 'Cada tentativa sorteia questões do banco da ilha. Volte, tente de novo e construa sua evolução passo a passo.',
     showMetaToStudent: false,
     logo: 'logo-prenat.png',
     ranks: [
-      { name:'Ovo da Travessia', icon:'🥚', description:'Começo da jornada.' },
-      { name:'Filhote do Casco', icon:'🐣', description:'Primeira conquista.' },
-      { name:'Explorador das Marés', icon:'🌊', description:'Avançou na travessia.' },
-      { name:'Guardião da Energia', icon:'⚡', description:'Resiste aos desafios.' },
-      { name:'Navegador da Vida', icon:'🌱', description:'Interpreta contextos.' },
-      { name:'Mestre da Evolução', icon:'🧬', description:'Domina questões fortes.' },
-      { name:'Grande Mestre da Natureza', icon:'🏆', description:'Venceu a missão.' }
+      { name:'Ovo da Travessia', icon:'🥚', description:'Todo grande percurso começa protegido pela casca. A missão está pronta para começar.' },
+      { name:'Filhote do Casco', icon:'🐣', description:'Você rompeu a primeira casca e deu o primeiro passo no arquipélago PRENAT+.' },
+      { name:'Explorador das Marés', icon:'🌊', description:'Você já reconhece padrões, atravessa conceitos básicos e mantém a rota.' },
+      { name:'Guardião da Energia', icon:'⚡', description:'Você sustenta o ritmo diante de questões médias e armadilhas conceituais.' },
+      { name:'Navegador da Vida', icon:'🌱', description:'Você conecta dados, fenômenos, cotidiano e interpretação científica.' },
+      { name:'Mestre da Evolução', icon:'🧬', description:'Você venceu etapas densas e aprendeu a eliminar distratores fortes.' },
+      { name:'Grande Mestre da Natureza', icon:'🏆', description:'Você completou a travessia e venceu o Boss Final da missão PRENAT+.' }
     ],
     phases: []
   };
@@ -113,6 +114,7 @@
     if (brandName) brandName.textContent = settings.brand;
     if (missionMini) missionMini.textContent = settings.missionName;
     if (brandLogo && settings.logo) brandLogo.src = settings.logo;
+    document.querySelectorAll('.mission-logo-img').forEach(img => { if (settings.logo) img.src = settings.logo; });
   }
 
   function stateKey() {
@@ -120,12 +122,7 @@
   }
 
   function createInitialProgress() {
-    return {
-      unlockedPhase: 1,
-      completedPhases: [],
-      rankIndex: 0,
-      phaseScores: {}
-    };
+    return { unlockedPhase: 1, completedPhases: [], rankIndex: 0, phaseScores: {} };
   }
 
   function loadProgress() {
@@ -150,7 +147,7 @@
     bindText('[data-bind="missionName"]', settings.missionName);
     bindText('[data-bind="subtitle"]', settings.subtitle);
     bindText('[data-bind="intro"]', settings.intro);
-    bindText('[data-bind="studentThemeNote"]', settings.studentThemeNote || '');
+    bindText('[data-bind="studentThemeNote"]', settings.studentThemeNote || 'Avance no seu ritmo. Cada tentativa é treino real.');
 
     renderRankPanel();
     renderMap();
@@ -181,7 +178,7 @@
     app.querySelector('[data-progress-text]').textContent = `${percent}%`;
     app.querySelector('[data-progress-caption]').textContent = nextRank
       ? `${completedCount} de ${total} ilhas concluídas · próxima patente: ${nextRank.name}`
-      : `${completedCount} de ${total} ilhas concluídas · missão completa`;
+      : `${completedCount} de ${total} ilhas concluídas · travessia completa`;
     const circle = app.querySelector('[data-progress-circle]');
     if (circle) circle.style.strokeDashoffset = String(314 - (314 * percent / 100));
   }
@@ -189,39 +186,44 @@
   function renderMap() {
     const map = app.querySelector('[data-island-map]');
     const story = app.querySelector('[data-map-story]');
-    if (story) story.textContent = 'Cada ilha é uma etapa de dificuldade progressiva. As questões misturam as três áreas de Ciências da Natureza.';
+    if (story) story.textContent = 'Cada ilha é uma etapa de dificuldade progressiva. A missão sorteia questões do banco, mistura Natureza e mantém o desafio vivo a cada tentativa.';
     if (!map) return;
-    map.innerHTML = '';
+    map.innerHTML = '<div class="map-route" aria-hidden="true"></div>';
     settings.phases.forEach((phase, index) => {
       const unlocked = phase.id <= progress.unlockedPhase;
       const completed = progress.completedPhases.includes(phase.id);
       const phaseQuestions = getQuestionsForPhase(phase.id);
+      const playableCount = getPlayableCount(phase, phaseQuestions.length);
       const rank = settings.ranks[phase.rewardRankIndex] || {};
       const card = document.createElement('article');
-      card.className = `island-card ${unlocked ? '' : 'locked'}`;
+      card.className = `journey-island island-${index + 1} ${unlocked ? 'island-open' : 'locked'} ${completed ? 'completed' : ''}`;
       card.innerHTML = `
-        ${completed ? '<span class="completed-ribbon">CONQUISTADA</span>' : ''}
-        <span class="lock-badge">${unlocked ? (completed ? '✓' : 'Aberta') : '🔒'}</span>
-        <div class="island-art">
-          <div class="island-orb"></div>
-          <div class="island-icon">${index === settings.phases.length - 1 ? '🐉' : (rank.icon || '🏝️')}</div>
+        <div class="island-node">
+          <span class="island-step">${index + 1}</span>
+          <div class="island-scene">
+            <div class="water-halo"></div>
+            <div class="land-mass"></div>
+            <div class="island-symbol">${index === settings.phases.length - 1 ? '🏆' : (rank.icon || islandIcons[index] || '🏝️')}</div>
+          </div>
         </div>
-        <div>
-          <span class="tiny-label">${escapeHtml(phase.name)}</span>
+        <div class="island-content">
+          <div class="island-status-row">
+            <span class="tiny-label">${escapeHtml(phase.name)}</span>
+            <span class="lock-badge">${completed ? 'Conquistada' : unlocked ? 'Aberta' : 'Bloqueada'}</span>
+          </div>
           <h3>${escapeHtml(phase.title)}</h3>
           <p>${escapeHtml(phase.story)}</p>
           <div class="island-meta">
             <span class="meta-chip">Meta ${phase.minPercent}%</span>
             <span class="meta-chip">${phase.lives} vidas</span>
-            <span class="meta-chip">${phase.questionLimit ? `até ${phase.questionLimit}` : 'todas'} questões</span>
+            <span class="meta-chip">${playableCount || phase.questionLimit || 'todas'} questões na rodada</span>
             <span class="meta-chip">${escapeHtml(phase.difficultyLabel)}</span>
           </div>
           <button class="btn ${unlocked ? 'btn-primary' : 'btn-soft'}" ${unlocked && phaseQuestions.length ? '' : 'disabled'} data-start-phase="${phase.id}">
             ${completed ? 'Refazer ilha' : unlocked ? 'Entrar na ilha' : 'Bloqueada'}
           </button>
           ${unlocked && !phaseQuestions.length ? '<p class="small-muted">Ilha em preparação: ainda não há questões cadastradas.</p>' : ''}
-        </div>
-      `;
+        </div>`;
       map.appendChild(card);
     });
     map.querySelectorAll('[data-start-phase]').forEach(btn => btn.addEventListener('click', () => startPhase(Number(btn.dataset.startPhase))));
@@ -231,18 +233,30 @@
     return questions.filter(q => Number(q.phase) === Number(phaseId) && q.statement && q.options.length >= 2 && q.options.some(op => op.correct));
   }
 
+  function getPlayableCount(phase, poolLength) {
+    if (!poolLength) return 0;
+    if (!phase.questionLimit || phase.questionLimit <= 0) return poolLength;
+    return Math.min(phase.questionLimit, poolLength);
+  }
+
+  function selectQuestionsForAttempt(phase, pool) {
+    const shuffled = phase.shuffle ? shuffleArray(pool) : [...pool];
+    const limit = getPlayableCount(phase, shuffled.length);
+    return shuffled.slice(0, limit);
+  }
+
   function startPhase(phaseId) {
     const phase = settings.phases.find(p => p.id === phaseId);
     if (!phase || phase.id > progress.unlockedPhase) return renderHome();
-    let phaseQuestions = getQuestionsForPhase(phase.id);
-    if (!phaseQuestions.length) {
+    const pool = getQuestionsForPhase(phase.id);
+    if (!pool.length) {
       alert('Esta ilha ainda não possui questões cadastradas.');
       return renderHome();
     }
-    if (phase.shuffle) phaseQuestions = shuffleArray(phaseQuestions);
-    if (phase.questionLimit && phase.questionLimit > 0) phaseQuestions = phaseQuestions.slice(0, phase.questionLimit);
+    const phaseQuestions = selectQuestionsForAttempt(phase, pool);
     currentRun = {
       phase,
+      poolSize: pool.length,
       questions: phaseQuestions,
       index: 0,
       lives: phase.lives,
@@ -265,12 +279,12 @@
     app.querySelector('[data-lives]').textContent = '❤️'.repeat(run.lives) || '0';
     app.querySelector('[data-minpercent]').textContent = `${run.phase.minPercent}%`;
     app.querySelector('[data-score]').textContent = `${run.score}/${run.questions.length}`;
-    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length}`;
+    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length} · sorteada do banco da ilha`;
     app.querySelector('[data-quiz-progress]').style.width = `${(run.index / run.questions.length) * 100}%`;
     app.querySelector('[data-question-index]').textContent = `Questão ${run.index + 1}`;
     app.querySelector('[data-question-meta]').textContent = settings.showMetaToStudent
       ? [q.discipline, q.topic, q.difficulty].filter(Boolean).join(' · ')
-      : 'Ciências da Natureza';
+      : 'Desafio de Natureza';
     app.querySelector('[data-question-statement]').innerHTML = q.statement;
 
     const imgWrap = app.querySelector('[data-question-image-wrap]');
@@ -312,13 +326,27 @@
 
     const panel = app.querySelector('[data-feedback-panel]');
     panel.classList.remove('hidden');
-    app.querySelector('[data-feedback-title]').textContent = isCorrect ? 'Resposta correta!' : 'Quase! Observe a armadilha.';
-    app.querySelector('[data-feedback-text]').innerHTML = q.explanation || (isCorrect ? 'Você marcou a alternativa correta.' : 'Leia o comentário da alternativa e tente identificar o erro conceitual.');
-    app.querySelector('[data-feedback-descriptor]').innerHTML = selected?.feedback || '';
+    panel.classList.toggle('correct-feedback', isCorrect);
+    panel.classList.toggle('wrong-feedback', !isCorrect);
+    app.querySelector('[data-feedback-title]').textContent = isCorrect ? 'Você avançou na ilha!' : (run.lives <= 0 ? 'As vidas acabaram nesta rodada.' : 'Armadilha encontrada — ajuste a rota.');
+    app.querySelector('[data-feedback-text]').innerHTML = buildFeedbackText(isCorrect, q, selected);
+    app.querySelector('[data-feedback-descriptor]').innerHTML = selected?.feedback || (isCorrect ? 'Boa leitura: você identificou o ponto central da situação.' : 'Volte ao conceito-chave e tente perceber por que essa alternativa seduz.');
     const nextButton = app.querySelector('[data-action="next-question"]');
-    nextButton.textContent = run.lives <= 0 ? 'Ver resultado' : (run.index >= run.questions.length - 1 ? 'Concluir ilha' : 'Próxima questão');
+    nextButton.textContent = run.lives <= 0 ? 'Ver resultado' : (run.index >= run.questions.length - 1 ? 'Concluir ilha' : 'Continuar travessia');
     nextButton.addEventListener('click', nextStep);
     typesetMath();
+  }
+
+  function buildFeedbackText(isCorrect, q) {
+    const explanation = q.explanation || '';
+    if (isCorrect) {
+      return explanation
+        ? `<strong>Mandou bem.</strong> ${explanation}`
+        : '<strong>Mandou bem.</strong> Você venceu a armadilha desta questão e manteve a travessia em movimento.';
+    }
+    return explanation
+      ? `<strong>Boa tentativa.</strong> ${explanation}<br><br>Respire, ajuste a estratégia e siga. Errar aqui também faz parte do treino.`
+      : '<strong>Boa tentativa.</strong> Essa alternativa tinha uma armadilha. Respire, revise o conceito e siga para a próxima decisão.';
   }
 
   function nextStep() {
@@ -339,7 +367,7 @@
       if (!progress.completedPhases.includes(run.phase.id)) progress.completedPhases.push(run.phase.id);
       progress.unlockedPhase = Math.max(progress.unlockedPhase, run.phase.id + 1);
       progress.rankIndex = Math.max(progress.rankIndex, run.phase.rewardRankIndex || 0);
-      progress.phaseScores[run.phase.id] = { score: run.score, total: run.questions.length, percent, date: new Date().toISOString() };
+      progress.phaseScores[run.phase.id] = { score: run.score, total: run.questions.length, percent, date: new Date().toISOString(), poolSize: run.poolSize };
       saveProgress();
     }
     renderResult({ passed, percent, previousRank, nextRank, run });
@@ -349,21 +377,21 @@
     const template = document.getElementById('resultTemplate').content.cloneNode(true);
     app.innerHTML = '';
     app.appendChild(template);
-    app.querySelector('[data-result-icon]').textContent = passed ? (nextRank.icon || '🏆') : '💔';
-    app.querySelector('[data-result-kicker]').textContent = passed ? 'Ilha conquistada' : 'Game over da ilha';
-    app.querySelector('[data-result-title]').textContent = passed ? 'Você passou de fase!' : 'A travessia ainda não foi concluída';
+    app.querySelector('[data-result-icon]').textContent = passed ? (nextRank.icon || '🏆') : '🌊';
+    app.querySelector('[data-result-kicker]').textContent = passed ? 'Ilha conquistada' : 'Travessia em treinamento';
+    app.querySelector('[data-result-title]').textContent = passed ? 'Você venceu esta ilha!' : 'Ainda não foi dessa vez.';
     app.querySelector('[data-result-message]').textContent = passed
-      ? `Você venceu ${run.phase.title} e desbloqueou a próxima etapa da missão.`
-      : `Você fez ${percent}% e precisava de ${run.phase.minPercent}% sem perder todas as vidas. Reforce os pontos fracos e tente novamente.`;
+      ? `Sucesso! Você superou ${run.phase.title}, abriu um novo caminho no arquipélago e conquistou a patente ${nextRank.name}. Continue: a próxima ilha já espera por você.`
+      : `Você fez ${percent}% e precisava de ${run.phase.minPercent}%. Isso não é fim de jornada: é ajuste de rota. Tente novamente; uma nova rodada será sorteada do banco desta ilha.`;
     app.querySelector('[data-result-score]').textContent = `${run.score}/${run.questions.length}`;
     app.querySelector('[data-result-percent]').textContent = `${percent}%`;
     app.querySelector('[data-result-target]').textContent = `${run.phase.minPercent}%`;
     app.querySelector('[data-rank-unlock]').innerHTML = passed
       ? `<span class="tiny-label">Nova patente desbloqueada</span><br><strong>${escapeHtml(previousRank.name)} → ${escapeHtml(nextRank.name)}</strong><p>${escapeHtml(nextRank.description || '')}</p>`
-      : `<strong>Patente bloqueada:</strong> vença a ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}.`;
+      : `<strong>Patente ainda bloqueada:</strong> vença esta ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}. Você pode tentar novamente quantas vezes precisar.`;
 
     const mainButton = app.querySelector('[data-action="result-main"]');
-    mainButton.textContent = passed ? 'Ir para próxima ilha' : 'Tentar novamente';
+    mainButton.textContent = passed ? 'Avançar para próxima ilha' : 'Tentar nova rodada';
     mainButton.addEventListener('click', () => {
       if (passed) {
         const nextPhase = settings.phases.find(p => p.id === run.phase.id + 1);

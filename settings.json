@@ -1,28 +1,56 @@
 {
-  "slug": "missao-ilhas-natureza-prenat-v2",
+  "slug": "missao-ilhas-natureza-prenat-v3-flow",
   "brand": "PRENAT+",
   "missionName": "Missão Ilhas da Natureza",
   "missionKicker": "CAMPO DE TREINO PRENAT+",
-  "subtitle": "Uma jornada RPG com questões misturadas de Biologia, Física e Química.",
-  "intro": "Atravesse o arquipélago, conquiste patentes e prove que domina Ciências da Natureza sem perder todas as vidas.",
-  "studentThemeNote": "As questões misturam Biologia, Física e Química. As etiquetas são internas do professor.",
+  "subtitle": "Uma travessia estratégica com desafios progressivos de Ciências da Natureza.",
+  "intro": "Avance pelo arquipélago, vença ilhas, conquiste patentes e treine Biologia, Física e Química em uma mesma jornada.",
+  "studentThemeNote": "Cada tentativa sorteia questões do banco da ilha. Volte, tente de novo e construa sua evolução passo a passo.",
   "showMetaToStudent": false,
   "logo": "logo-prenat.png",
   "ranks": [
-    { "name": "Ovo da Travessia", "icon": "🥚", "description": "Começo da jornada. A casca ainda protege o aluno antes da primeira ilha." },
-    { "name": "Filhote do Casco", "icon": "🐣", "description": "A primeira conquista. O aluno rompeu a casca e entrou no arquipélago." },
-    { "name": "Explorador das Marés", "icon": "🌊", "description": "Já atravessa conceitos básicos e começa a reconhecer padrões de prova." },
-    { "name": "Guardião da Energia", "icon": "⚡", "description": "Aprendeu a resistir às questões médias e interpretar situações científicas." },
-    { "name": "Navegador da Vida", "icon": "🌱", "description": "Consegue ligar fenômenos, dados, gráficos e contextos do cotidiano." },
-    { "name": "Mestre da Evolução", "icon": "🧬", "description": "Domina questões mais densas, interdisciplinares e com distratores fortes." },
-    { "name": "Grande Mestre da Natureza", "icon": "🏆", "description": "Venceu o Boss Final e concluiu a travessia PRENAT+." }
+    {
+      "name": "Ovo da Travessia",
+      "icon": "🥚",
+      "description": "Todo grande percurso começa protegido pela casca. A missão está pronta para começar."
+    },
+    {
+      "name": "Filhote do Casco",
+      "icon": "🐣",
+      "description": "Você rompeu a primeira casca e deu o primeiro passo no arquipélago PRENAT+."
+    },
+    {
+      "name": "Explorador das Marés",
+      "icon": "🌊",
+      "description": "Você já reconhece padrões, atravessa conceitos básicos e mantém a rota."
+    },
+    {
+      "name": "Guardião da Energia",
+      "icon": "⚡",
+      "description": "Você sustenta o ritmo diante de questões médias e armadilhas conceituais."
+    },
+    {
+      "name": "Navegador da Vida",
+      "icon": "🌱",
+      "description": "Você conecta dados, fenômenos, cotidiano e interpretação científica."
+    },
+    {
+      "name": "Mestre da Evolução",
+      "icon": "🧬",
+      "description": "Você venceu etapas densas e aprendeu a eliminar distratores fortes."
+    },
+    {
+      "name": "Grande Mestre da Natureza",
+      "icon": "🏆",
+      "description": "Você completou a travessia e venceu o Boss Final da missão PRENAT+."
+    }
   ],
   "phases": [
     {
       "id": 1,
       "name": "Ilha 1",
       "title": "Rompendo a Casca",
-      "story": "A tartaruga PRENAT+ chegou à primeira ilha. O desafio é vencer questões básicas misturadas de Natureza.",
+      "story": "Primeira parada do arquipélago. O desafio é aquecer a mente e vencer questões básicas misturadas de Natureza.",
       "minPercent": 60,
       "lives": 3,
       "questionLimit": 10,
@@ -34,10 +62,10 @@
       "id": 2,
       "name": "Ilha 2",
       "title": "Caminho do Filhote",
-      "story": "O aluno avança para questões um pouco mais interpretativas, ainda com base conceitual forte.",
+      "story": "A travessia começa a exigir mais leitura, atenção aos conceitos e cuidado com alternativas parecidas.",
       "minPercent": 65,
       "lives": 3,
-      "questionLimit": 20,
+      "questionLimit": 15,
       "shuffle": true,
       "rewardRankIndex": 2,
       "difficultyLabel": "Base + interpretação"
@@ -46,10 +74,10 @@
       "id": 3,
       "name": "Ilha 3",
       "title": "Mar das Estratégias",
-      "story": "Agora o jogo exige leitura cuidadosa, comparação de dados e identificação de armadilhas.",
+      "story": "Agora o aluno cruza mares com gráficos, comparações, contextos e armadilhas de prova.",
       "minPercent": 70,
       "lives": 3,
-      "questionLimit": 30,
+      "questionLimit": 20,
       "shuffle": true,
       "rewardRankIndex": 3,
       "difficultyLabel": "Intermediário"
@@ -58,10 +86,10 @@
       "id": 4,
       "name": "Ilha 4",
       "title": "Trilha da Resistência",
-      "story": "A travessia fica mais intensa: textos maiores, gráficos e situações com mais de um conceito envolvido.",
+      "story": "A jornada fica mais intensa: textos maiores, ideias combinadas e necessidade de manter foco até o fim.",
       "minPercent": 75,
       "lives": 3,
-      "questionLimit": 45,
+      "questionLimit": 30,
       "shuffle": true,
       "rewardRankIndex": 4,
       "difficultyLabel": "Médio-forte"
@@ -70,10 +98,10 @@
       "id": 5,
       "name": "Ilha 5",
       "title": "Templo da Evolução",
-      "story": "O aluno enfrenta questões mais profundas, com maior cobrança de raciocínio e eliminação de distratores.",
+      "story": "O aluno entra no templo das questões profundas, com distratores fortes e raciocínio mais exigente.",
       "minPercent": 80,
       "lives": 4,
-      "questionLimit": 60,
+      "questionLimit": 35,
       "shuffle": true,
       "rewardRankIndex": 5,
       "difficultyLabel": "Avançado"
@@ -82,13 +110,13 @@
       "id": 6,
       "name": "Boss Final",
       "title": "Grande Batalha da Natureza",
-      "story": "Última travessia. Questões hard, integradas e com cara de prova. Só os resistentes chegam ao final.",
-      "minPercent": 85,
+      "story": "Última travessia. Questões hard, integradas e com cara de prova. O objetivo é superar a meta final.",
+      "minPercent": 80,
       "lives": 4,
-      "questionLimit": 90,
+      "questionLimit": 45,
       "shuffle": true,
       "rewardRankIndex": 6,
-      "difficultyLabel": "Hard, hard, hard"
+      "difficultyLabel": "Hard final"
     }
   ]
 }

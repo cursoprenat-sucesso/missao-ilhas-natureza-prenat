@@ -1,116 +1,50 @@
-# Guia passo a passo — PRENAT+ RPG V2
+# Guia rápido PRENAT+ V3 FLOW
 
-## 1. Link do aluno e link do professor
+## 1. Link do aluno
 
-O aluno entra no link normal do site:
+Use o link normal do GitHub Pages:
 
 `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/`
 
-O professor entra no painel:
+## 2. Link do professor
+
+Use o mesmo link com `professor.html` no final:
 
 `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html`
 
-Não divulgue o link do professor para os alunos.
+## 3. Como funciona o banco de questões
 
----
+Você pode cadastrar mais questões do que o aluno vai responder.
 
-## 2. Como cadastrar questões
+Exemplo:
 
-1. Abra `professor.html`.
-2. Clique em **Cadastrar questões**.
-3. Escolha a fase/ilha.
-4. Preencha disciplina, tema e dificuldade como etiquetas internas.
-5. Escreva o enunciado.
-6. Se a questão tiver imagem, escreva o nome do arquivo da imagem, por exemplo: `grafico01.png`.
-7. Preencha alternativas A, B, C, D e E.
-8. Marque a alternativa correta.
-9. Escreva o comentário geral do gabarito.
-10. Escreva o comentário/distrator de cada alternativa.
-11. Clique em **Salvar questão**.
-12. Depois clique em **Baixar questions.json**.
-13. Substitua o arquivo `questions.json` no GitHub.
+- Ilha 1: 30 questões cadastradas
+- Questões por tentativa: 10
+- Resultado: o aluno responde 10 questões sorteadas aleatoriamente a cada tentativa.
 
----
+Isso faz o aluno poder tentar de novo sem receber exatamente a mesma sequência.
 
-## 3. Como configurar as fases
+## 4. Como atualizar o jogo
 
-1. Abra `professor.html`.
-2. Clique em **Configurar missão**.
-3. Edite:
-   - nome da missão;
-   - subtítulo;
-   - introdução;
-   - nome das ilhas;
-   - vidas;
-   - meta mínima;
-   - limite de questões;
-   - patente desbloqueada.
-4. Clique em **Baixar settings.json**.
-5. Substitua o arquivo `settings.json` no GitHub.
+1. Acesse `professor.html`.
+2. Configure fases e cadastre questões.
+3. Baixe `settings.json` e `questions.json`.
+4. No GitHub, clique em `Add file > Upload files`.
+5. Envie os arquivos novos para substituir os antigos.
+6. Clique em `Commit changes`.
+7. Aguarde alguns minutos e teste o link do aluno.
 
----
+## 5. O que subir quando trocar esta versão
 
-## 4. Como colocar imagem na questão
+Suba estes arquivos no GitHub:
 
-Suba a imagem junto com os arquivos do GitHub, na raiz do repositório.
-
-Exemplo de nome:
-
-`grafico-calorimetria.png`
-
-No campo de imagem da questão, escreva exatamente:
-
-`grafico-calorimetria.png`
-
-Evite nomes com acentos e espaços.
-
-Use preferencialmente:
-
-- `.png`
-- `.jpg`
-- `.webp`
-
----
-
-## 5. Como usar fórmulas
-
-Subscrito:
-
-`H<sub>2</sub>O`
-
-Sobrescrito:
-
-`m/s<sup>2</sup>`
-
-Fórmula com LaTeX:
-
-`\( Q = m \cdot c \cdot \Delta T \)`
-
----
-
-## 6. Como atualizar no GitHub
-
-1. Vá no repositório.
-2. Clique em **Add file > Upload files**.
-3. Arraste os arquivos novos.
-4. Se aparecer aviso de substituição, pode continuar.
-5. Clique em **Commit changes**.
-6. Espere alguns minutos.
-7. Teste o link do aluno.
-
----
-
-## 7. Quantas questões posso colocar?
-
-Não há um limite fixo no jogo. Você pode colocar muitas questões por fase.
-
-Recomendação prática:
-
-- fase 1: 10 questões;
-- fase 2: 20 questões;
-- fase 3: 30 questões;
-- fase 4: 45 questões;
-- fase 5: 60 questões;
-- fase 6: 90 questões.
-
-No `settings.json`, cada fase tem um campo chamado `questionLimit`. Se houver mais questões cadastradas do que o limite, o jogo usa apenas a quantidade configurada.
+- `index.html`
+- `app.js`
+- `style.css`
+- `settings.json`
+- `questions.json`
+- `professor.html`
+- `professor.js`
+- `logo-prenat.png`
+- `README.md`
+- `GUIA_PASSO_A_PASSO.md`

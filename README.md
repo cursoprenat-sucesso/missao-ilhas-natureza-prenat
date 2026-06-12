@@ -1,28 +1,36 @@
-# PRENAT+ | Missão Ilhas da Natureza RPG V2
+# PRENAT+ | Missão Ilhas da Natureza V3 FLOW
 
-Esta é a versão premium do jogo gamificado PRENAT+ para o Campo de Treino.
+Versão visual premium do jogo gamificado PRENAT+ para o Campo de Treino.
 
-## Arquivos principais
+## Links
 
-- `index.html`: ambiente do aluno.
-- `professor.html`: ambiente do professor para configurar missão e cadastrar questões.
-- `style.css`: visual premium/RPG.
-- `app.js`: lógica do jogo do aluno.
-- `professor.js`: lógica do painel do professor.
-- `settings.json`: configuração da missão, fases, vidas, metas e patentes.
-- `questions.json`: banco de questões.
-- `logo-prenat.png`: logo usada no jogo.
+- Aluno: `index.html`
+- Professor: `professor.html`
 
-## Links depois de publicar no GitHub Pages
+## O que mudou na V3
 
-Aluno:
+- Visual do aluno mais próximo de uma travessia por ilhas.
+- Fases com sensação de arquipélago e progressão.
+- Mensagens motivacionais de vitória e tentativa.
+- Sorteio automático de questões: você pode cadastrar um banco maior e definir quantas questões o aluno responde por tentativa.
+- Painel do professor preservado para configurar fases, vidas, metas, patentes e questões.
 
-`https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`
+## Sorteio de questões
 
-Professor:
+Em cada fase, o campo `questionLimit` define quantas questões aparecem na rodada.
 
-`https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/professor.html`
+Exemplo: se a fase tem 30 questões cadastradas e `questionLimit` é 10, o aluno responde apenas 10 por tentativa. A cada nova tentativa, o sistema embaralha e sorteia outro conjunto do banco da fase.
 
-## Observação
+## Imagens nas questões
 
-O painel do professor não salva direto no GitHub. Ele baixa arquivos JSON. Depois, você sobe/substitui esses arquivos no GitHub.
+Suba a imagem no GitHub junto com os arquivos e use o nome no campo de imagem da questão, por exemplo:
+
+`grafico-calorimetria.png`
+
+## Fórmulas
+
+Aceita HTML simples e LaTeX:
+
+- `H<sub>2</sub>O`
+- `m/s<sup>2</sup>`
+- `\( Q = m \cdot c \cdot \Delta T \)`
