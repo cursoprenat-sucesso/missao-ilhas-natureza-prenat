@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PRENAT+ | Missão Ilhas da Natureza</title>
+  <meta name="description" content="Trilha gamificada de questões de Ciências da Natureza PRENAT+." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[','\\]']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sea-bg" aria-hidden="true">
+    <div class="wave wave-1"></div>
+    <div class="wave wave-2"></div>
+    <div class="wave wave-3"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">P+</div>
+      <div>
+        <strong>PRENAT+</strong>
+        <span>Missão Ilhas da Natureza</span>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <a href="editor.html" class="ghost-link" title="Abrir área do professor">Área do Professor</a>
+      <button id="resetProgressBtn" class="ghost-btn" type="button">Reiniciar progresso</button>
+    </nav>
+  </header>
+
+  <main id="app" class="app-shell" aria-live="polite"></main>
+
+  <template id="loadingTemplate">
+    <section class="center-card">
+      <div class="loader"></div>
+      <h1>Carregando missão...</h1>
+      <p>Preparando ilhas, vidas e desafios.</p>
+    </section>
+  </template>
+
+  <input id="bankFileInput" class="hidden" type="file" accept="application/json,.json" />
+
+  <script defer src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PRENAT+ | Editor do Professor</title>
+  <meta name="description" content="Editor visual para cadastrar questões da trilha PRENAT+." />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[','\\]']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="editor-body">
+  <header class="topbar editor-topbar">
+    <div class="brand">
+      <div class="brand-mark">P+</div>
+      <div>
+        <strong>Editor do Professor</strong>
+        <span>cadastre questões sem mexer em código</span>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <a href="index.html" class="ghost-link">Voltar ao jogo</a>
+      <button id="exportJsonBtn" class="primary-btn compact" type="button">Baixar banco JSON</button>
+    </nav>
+  </header>
+
+  <main class="editor-shell">
+    <section class="editor-hero">
+      <div>
+        <p class="eyebrow">sem código</p>
+        <h1>Monte as questões pelo formulário</h1>
+        <p>Escolha a fase, preencha enunciado, alternativas, gabarito e comentário. No fim, baixe o arquivo <strong>questions.json</strong> e substitua dentro da pasta <strong>data/</strong>.</p>
+      </div>
+      <div class="editor-actions-card">
+        <button id="importJsonBtn" type="button" class="secondary-btn">Importar JSON</button>
+        <button id="importCsvBtn" type="button" class="secondary-btn">Importar CSV</button>
+        <button id="downloadCsvTemplateBtn" type="button" class="secondary-btn">Baixar modelo CSV</button>
+        <button id="clearLocalBtn" type="button" class="danger-btn">Limpar edição local</button>
+      </div>
+    </section>
+
+    <section class="editor-grid">
+      <aside class="panel phase-panel">
+        <div class="panel-header">
+          <h2>Fases/ilhas</h2>
+          <button id="newPhaseBtn" type="button" class="tiny-btn">+ fase</button>
+        </div>
+        <div id="phaseList" class="phase-list-editor"></div>
+      </aside>
+
+      <section class="panel form-panel">
+        <div class="panel-header">
+          <h2 id="formTitle">Nova questão</h2>
+          <span id="questionCount" class="pill">0 questões</span>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="question" type="button">Questão</button>
+          <button class="tab" data-tab="phase" type="button">Configurar fase</button>
+          <button class="tab" data-tab="preview" type="button">Prévia</button>
+        </div>
+
+        <form id="questionForm" class="editor-form tab-content active" data-tab-content="question">
+          <div class="field-row">
+            <label>Disciplina
+              <select id="discipline" required>
+                <option>Física</option>
+                <option>Química</option>
+                <option>Biologia</option>
+                <option>Interdisciplinar</option>
+              </select>
+            </label>
+            <label>Tema
+              <input id="topic" type="text" placeholder="Ex.: Calorimetria" required />
+            </label>
+          </div>
+
+          <label>Enunciado
+            <textarea id="text" rows="6" placeholder="Cole o enunciado completo aqui. Pode usar H<sub>2</sub>O, m/s<sup>2</sup> ou \( Q = mc\Delta T \)." required></textarea>
+          </label>
+
+          <label>Imagem da questão (opcional)
+            <input id="image" type="text" placeholder="Ex.: grafico-calorimetria.png ou link de imagem" />
+          </label>
+
+          <div class="option-fields">
+            <label>Alternativa A <textarea id="opt0" rows="2" required></textarea></label>
+            <label>Alternativa B <textarea id="opt1" rows="2" required></textarea></label>
+            <label>Alternativa C <textarea id="opt2" rows="2" required></textarea></label>
+            <label>Alternativa D <textarea id="opt3" rows="2" required></textarea></label>
+            <label>Alternativa E <textarea id="opt4" rows="2" required></textarea></label>
+          </div>
+
+          <div class="field-row">
+            <label>Alternativa correta
+              <select id="correctIndex" required>
+                <option value="0">A</option>
+                <option value="1">B</option>
+                <option value="2">C</option>
+                <option value="3">D</option>
+                <option value="4">E</option>
+              </select>
+            </label>
+            <label>Código interno da questão
+              <input id="questionId" type="text" placeholder="Gerado automaticamente se deixar vazio" />
+            </label>
+          </div>
+
+          <label>Comentário do gabarito
+            <textarea id="explanation" rows="5" placeholder="Explique por que a correta está correta e qual conceito foi cobrado." required></textarea>
+          </label>
+
+          <div class="option-fields">
+            <label>Descritor/distrator A <textarea id="desc0" rows="2" placeholder="Ex.: Erro comum: trata frio como substância."></textarea></label>
+            <label>Descritor/distrator B <textarea id="desc1" rows="2"></textarea></label>
+            <label>Descritor/distrator C <textarea id="desc2" rows="2"></textarea></label>
+            <label>Descritor/distrator D <textarea id="desc3" rows="2"></textarea></label>
+            <label>Descritor/distrator E <textarea id="desc4" rows="2"></textarea></label>
+          </div>
+
+          <div class="form-actions">
+            <button id="saveQuestionBtn" class="primary-btn" type="submit">Salvar questão na fase</button>
+            <button id="resetFormBtn" class="secondary-btn" type="button">Limpar formulário</button>
+          </div>
+        </form>
+
+        <form id="phaseForm" class="editor-form tab-content" data-tab-content="phase">
+          <div class="field-row">
+            <label>Nome da ilha/fase
+              <input id="phaseTitle" type="text" required />
+            </label>
+            <label>Subtítulo
+              <input id="phaseSubtitle" type="text" />
+            </label>
+          </div>
+          <label>História da fase
+            <textarea id="phaseStory" rows="4"></textarea>
+          </label>
+          <div class="field-row">
+            <label>Vidas
+              <input id="phaseLives" type="number" min="1" max="10" required />
+            </label>
+            <label>Porcentagem mínima para passar
+              <input id="phaseMinScore" type="number" min="0" max="100" required />
+            </label>
+          </div>
+          <label>Ícone/emoji visual da ilha
+            <input id="phaseIcon" type="text" maxlength="4" placeholder="Ex.: 🐢" />
+          </label>
+          <div class="form-actions">
+            <button class="primary-btn" type="submit">Salvar fase</button>
+            <button id="deletePhaseBtn" class="danger-btn" type="button">Excluir fase</button>
+          </div>
+        </form>
+
+        <section id="previewPanel" class="tab-content preview-panel" data-tab-content="preview"></section>
+      </section>
+
+      <aside class="panel question-panel">
+        <div class="panel-header">
+          <h2>Questões da fase</h2>
+          <span id="selectedPhaseBadge" class="pill">fase 1</span>
+        </div>
+        <div id="questionList" class="question-list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <input id="jsonInput" class="hidden" type="file" accept="application/json,.json" />
+  <input id="csvInput" class="hidden" type="file" accept="text/csv,.csv" />
+
+  <script defer src="defaultBank.js"></script>
+  <script defer src="editor.js"></script>
+</body>
+</html>
