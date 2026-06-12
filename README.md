@@ -38,3 +38,9 @@ Esta versão força o navegador a carregar novos arquivos: `app-tartarugas-v8.js
 
 ## V12 Final Anti-cache
 Use esta versão quando o navegador/GitHub Pages não mostrar as mudanças. O aluno carrega `app-v12-final.js` e `style-v12-final.css`. O professor carrega `professor-v12-final.js`.
+
+
+## V13 Boss claro
+- O Boss Final agora usa um ícone bem explícito com **🏆 + 🦈**, para não parecer DNA ou símbolo abstrato.
+- O professor continua com as fontes em **2. Configurar missão**.
+- No cadastro de questões foi adicionado um aviso indicando onde alterar as fontes.
