@@ -4,51 +4,137 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PRENAT+ | Missão Ilhas da Natureza</title>
-  <meta name="description" content="Trilha gamificada de questões de Ciências da Natureza PRENAT+." />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <meta name="description" content="Jogo gamificado PRENAT+ para treino de Ciências da Natureza." />
   <link rel="stylesheet" href="style.css" />
   <script>
     window.MathJax = {
-      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[','\\]']] },
-      svg: { fontCache: 'global' },
-      startup: { typeset: false }
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+      svg: { fontCache: 'global' }
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body>
-  <div class="sea-bg" aria-hidden="true">
-    <div class="wave wave-1"></div>
-    <div class="wave wave-2"></div>
-    <div class="wave wave-3"></div>
-  </div>
-
+<body class="student-body">
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">P+</div>
+    <div class="brand-area">
+      <img id="brandLogo" class="brand-logo" src="logo-prenat.png" alt="PRENAT+" onerror="this.style.display='none'" />
       <div>
-        <strong>PRENAT+</strong>
-        <span>Missão Ilhas da Natureza</span>
+        <strong id="brandName">PRENAT+</strong>
+        <span id="missionMini">Missão Ilhas da Natureza</span>
       </div>
     </div>
-    <nav class="top-actions">
-      <a href="editor.html" class="ghost-link" title="Abrir área do professor">Área do Professor</a>
-      <button id="resetProgressBtn" class="ghost-btn" type="button">Reiniciar progresso</button>
-    </nav>
+    <button id="resetProgress" class="btn btn-ghost">Recomeçar missão</button>
   </header>
 
-  <main id="app" class="app-shell" aria-live="polite"></main>
-
-  <template id="loadingTemplate">
-    <section class="center-card">
-      <div class="loader"></div>
+  <main id="app" class="app-shell">
+    <section class="loading-card">
+      <div class="loader-orb"></div>
       <h1>Carregando missão...</h1>
-      <p>Preparando ilhas, vidas e desafios.</p>
+      <p>Preparando arquipélago, patentes e desafios.</p>
+    </section>
+  </main>
+
+  <template id="homeTemplate">
+    <section class="hero-grid fade-in">
+      <article class="hero-card glass-card">
+        <p class="kicker" data-bind="missionKicker"></p>
+        <h1 data-bind="missionName"></h1>
+        <p class="hero-subtitle" data-bind="subtitle"></p>
+        <p class="hero-intro" data-bind="intro"></p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-action="continue">Iniciar/continuar travessia</button>
+          <button class="btn btn-soft" data-action="view-map">Ver mapa</button>
+        </div>
+        <div class="note-strip" data-bind="studentThemeNote"></div>
+      </article>
+
+      <aside class="rank-panel glass-card">
+        <div class="rank-orb" data-rank-icon></div>
+        <div class="rank-card-inner">
+          <span class="tiny-label">Patente atual</span>
+          <h2 data-rank-name></h2>
+          <p data-rank-description></p>
+        </div>
+        <div class="progress-ring" aria-label="Progresso da missão">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" class="ring-bg"></circle>
+            <circle cx="60" cy="60" r="50" class="ring-value" data-progress-circle></circle>
+          </svg>
+          <strong data-progress-text>0%</strong>
+        </div>
+        <p class="progress-caption" data-progress-caption></p>
+      </aside>
+    </section>
+
+    <section id="mapa" class="map-card glass-card fade-in">
+      <div class="section-title-row">
+        <div>
+          <span class="kicker">Mapa do arquipélago</span>
+          <h2>Escolha a próxima ilha</h2>
+        </div>
+        <span class="badge-pill" data-bind="missionName"></span>
+      </div>
+      <div class="map-story" data-map-story></div>
+      <div class="island-map" data-island-map></div>
     </section>
   </template>
 
-  <input id="bankFileInput" class="hidden" type="file" accept="application/json,.json" />
+  <template id="quizTemplate">
+    <section class="quiz-layout fade-in">
+      <aside class="quiz-sidebar glass-card">
+        <button class="btn btn-ghost small" data-action="back-home">← Voltar ao mapa</button>
+        <span class="tiny-label">Ilha atual</span>
+        <h2 data-phase-title></h2>
+        <p data-phase-story></p>
+        <div class="stat-grid">
+          <div class="stat-box"><span>Vidas</span><strong data-lives></strong></div>
+          <div class="stat-box"><span>Meta</span><strong data-minpercent></strong></div>
+          <div class="stat-box"><span>Acertos</span><strong data-score></strong></div>
+        </div>
+        <div class="quest-progress"><div data-quiz-progress></div></div>
+        <p class="small-muted" data-question-count></p>
+      </aside>
+      <article class="question-card glass-card">
+        <div class="question-topline">
+          <span class="badge-pill" data-question-index></span>
+          <span class="badge-pill subtle" data-question-meta></span>
+        </div>
+        <h1 data-question-statement></h1>
+        <div class="question-image-wrap" data-question-image-wrap>
+          <img data-question-image alt="Imagem da questão" />
+        </div>
+        <div class="options-list" data-options-list></div>
+        <div class="feedback-panel hidden" data-feedback-panel>
+          <h3 data-feedback-title></h3>
+          <p data-feedback-text></p>
+          <p class="descriptor" data-feedback-descriptor></p>
+          <button class="btn btn-primary" data-action="next-question">Continuar</button>
+        </div>
+      </article>
+    </section>
+  </template>
 
-  <script defer src="app.js"></script>
+  <template id="resultTemplate">
+    <section class="result-card glass-card fade-in">
+      <div class="result-icon" data-result-icon></div>
+      <span class="kicker" data-result-kicker></span>
+      <h1 data-result-title></h1>
+      <p data-result-message></p>
+      <div class="result-stats">
+        <div><span>Acertos</span><strong data-result-score></strong></div>
+        <div><span>Aproveitamento</span><strong data-result-percent></strong></div>
+        <div><span>Meta</span><strong data-result-target></strong></div>
+      </div>
+      <div class="rank-unlock" data-rank-unlock></div>
+      <div class="hero-actions center">
+        <button class="btn btn-primary" data-action="result-main"></button>
+        <button class="btn btn-soft" data-action="back-home">Voltar ao mapa</button>
+      </div>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
 </body>
 </html>

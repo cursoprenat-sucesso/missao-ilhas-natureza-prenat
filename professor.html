@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Área do Professor | PRENAT+ RPG</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="teacher-body">
+  <header class="topbar">
+    <div class="brand-area">
+      <img class="brand-logo" src="logo-prenat.png" alt="PRENAT+" onerror="this.style.display='none'" />
+      <div>
+        <strong>PRENAT+ | Professor</strong>
+        <span>Editor da Missão RPG</span>
+      </div>
+    </div>
+    <a id="studentLinkTop" class="btn btn-soft" href="index.html" target="_blank" rel="noopener">Abrir jogo do aluno</a>
+  </header>
+
+  <main class="teacher-shell">
+    <section class="teacher-hero glass-card">
+      <div>
+        <span class="kicker">Painel do professor</span>
+        <h1>Monte sua missão sem mexer em código</h1>
+        <p>Configure fases, metas, vidas, patentes e cadastre questões com imagens, fórmulas, comentários e distratores.</p>
+      </div>
+      <div class="rank-orb">🧭</div>
+    </section>
+
+    <section class="teacher-grid">
+      <nav class="teacher-menu glass-card">
+        <button class="btn btn-primary" data-tab-btn="guia">1. Guia rápido</button>
+        <button class="btn btn-soft" data-tab-btn="config">2. Configurar missão</button>
+        <button class="btn btn-soft" data-tab-btn="questoes">3. Cadastrar questões</button>
+        <button class="btn btn-soft" data-tab-btn="exportar">4. Baixar arquivos</button>
+      </nav>
+
+      <section class="teacher-panel glass-card" data-tab="guia">
+        <h2>Como funciona</h2>
+        <p class="warning-tip">Este painel não altera o GitHub automaticamente. Ele gera os arquivos <strong>settings.json</strong> e <strong>questions.json</strong>. Depois você envia/substitui esses arquivos no GitHub.</p>
+        <div class="form-grid">
+          <div class="form-field full">
+            <label>Link do aluno</label>
+            <input id="studentLink" readonly />
+          </div>
+          <div class="form-field full">
+            <label>Link do professor</label>
+            <input id="teacherLink" readonly />
+          </div>
+        </div>
+        <div class="success-tip" style="margin-top:16px">
+          O aluno acessa somente o link do jogo. O professor acessa este painel pelo link terminado em <strong>professor.html</strong>.
+        </div>
+        <h2 style="margin-top:28px">Fluxo exato</h2>
+        <ol>
+          <li>Entre neste painel do professor.</li>
+          <li>Configure a missão e as fases, se quiser alterar nomes, metas, vidas e quantidade de questões.</li>
+          <li>Cadastre as questões.</li>
+          <li>Baixe <strong>settings.json</strong> e <strong>questions.json</strong>.</li>
+          <li>No GitHub, substitua os arquivos antigos pelos novos.</li>
+          <li>O link do aluno atualiza sozinho em alguns minutos.</li>
+        </ol>
+        <h2>Imagem e fórmula</h2>
+        <p>Para usar imagem em uma questão, envie a imagem para o GitHub junto com os arquivos e, no campo de imagem da questão, escreva apenas o nome do arquivo, por exemplo:</p>
+        <pre class="code-box">grafico-calorimetria.png</pre>
+        <p>Para fórmulas, você pode usar LaTeX:</p>
+        <pre class="code-box">\( Q = m \cdot c \cdot \Delta T \)</pre>
+      </section>
+
+      <section class="teacher-panel glass-card hidden" data-tab="config">
+        <h2>Configurar missão</h2>
+        <div class="form-grid">
+          <div class="form-field"><label>Marca</label><input id="brandInput" /></div>
+          <div class="form-field"><label>Nome da missão</label><input id="missionNameInput" /></div>
+          <div class="form-field"><label>Chamada superior</label><input id="missionKickerInput" /></div>
+          <div class="form-field"><label>Arquivo da logo</label><input id="logoInput" placeholder="logo-prenat.png" /></div>
+          <div class="form-field full"><label>Subtítulo</label><input id="subtitleInput" /></div>
+          <div class="form-field full"><label>Introdução</label><textarea id="introInput"></textarea></div>
+          <div class="form-field full"><label>Nota para o aluno</label><textarea id="studentThemeNoteInput"></textarea></div>
+          <div class="form-field"><label>Mostrar disciplina/tema ao aluno?</label><select id="showMetaInput"><option value="false">Não, deixar só para o professor</option><option value="true">Sim, mostrar etiquetas</option></select></div>
+        </div>
+        <h2 style="margin-top:28px">Fases/ilhas</h2>
+        <div id="phaseEditorList"></div>
+        <div class="teacher-actions">
+          <button class="btn btn-primary" id="saveConfigLocal">Salvar configuração no navegador</button>
+          <button class="btn btn-soft" id="resetConfigDefault">Restaurar padrão PRENAT+</button>
+        </div>
+      </section>
+
+      <section class="teacher-panel glass-card hidden" data-tab="questoes">
+        <h2>Cadastrar questões</h2>
+        <p class="warning-tip">As questões podem misturar Biologia, Física e Química em qualquer fase. A disciplina, tema e dificuldade servem como etiqueta interna do professor.</p>
+        <input type="hidden" id="editingQuestionId" />
+        <div class="form-grid three">
+          <div class="form-field"><label>Fase/ilha</label><select id="qPhase"></select></div>
+          <div class="form-field"><label>Disciplina interna</label><input id="qDiscipline" placeholder="Física, Química, Biologia..." /></div>
+          <div class="form-field"><label>Dificuldade interna</label><input id="qDifficulty" placeholder="Fácil, média, hard..." /></div>
+          <div class="form-field full"><label>Tema interno</label><input id="qTopic" placeholder="Calorimetria, ecologia, separação de misturas..." /></div>
+          <div class="form-field full"><label>Enunciado</label><textarea id="qStatement" placeholder="Cole ou escreva o enunciado. Pode usar H&lt;sub&gt;2&lt;/sub&gt;O e fórmulas em LaTeX."></textarea></div>
+          <div class="form-field full"><label>Imagem da questão (opcional)</label><input id="qImage" placeholder="grafico.png ou https://..." /></div>
+        </div>
+        <h2 style="margin-top:24px">Alternativas</h2>
+        <div id="optionsEditor"></div>
+        <div class="form-field full" style="margin-top:14px"><label>Comentário geral do gabarito</label><textarea id="qExplanation"></textarea></div>
+        <div class="teacher-actions">
+          <button class="btn btn-primary" id="saveQuestionBtn">Salvar questão</button>
+          <button class="btn btn-soft" id="clearQuestionBtn">Limpar formulário</button>
+        </div>
+        <h2 style="margin-top:30px">Banco de questões</h2>
+        <div id="questionBankList" class="question-bank-list"></div>
+      </section>
+
+      <section class="teacher-panel glass-card hidden" data-tab="exportar">
+        <h2>Baixar e atualizar no GitHub</h2>
+        <p class="success-tip">Depois de cadastrar ou editar, baixe os arquivos abaixo. No GitHub, envie os arquivos com os mesmos nomes para substituir os antigos.</p>
+        <div class="teacher-actions">
+          <button class="btn btn-primary" id="downloadSettings">Baixar settings.json</button>
+          <button class="btn btn-primary" id="downloadQuestions">Baixar questions.json</button>
+        </div>
+        <h2 style="margin-top:28px">Importar arquivos existentes</h2>
+        <p>Use isso quando você já tiver um <strong>settings.json</strong> ou <strong>questions.json</strong> salvo no computador e quiser continuar editando.</p>
+        <div class="form-grid">
+          <div class="form-field"><label>Importar settings.json</label><input type="file" id="importSettings" accept="application/json,.json" /></div>
+          <div class="form-field"><label>Importar questions.json</label><input type="file" id="importQuestions" accept="application/json,.json" /></div>
+        </div>
+        <h2 style="margin-top:28px">Passo a passo no GitHub</h2>
+        <ol>
+          <li>Volte ao repositório da missão.</li>
+          <li>Clique em <strong>Add file &gt; Upload files</strong>.</li>
+          <li>Arraste os novos arquivos <strong>settings.json</strong> e/ou <strong>questions.json</strong>.</li>
+          <li>Clique em <strong>Commit changes</strong>.</li>
+          <li>Aguarde alguns minutos e teste o link do aluno.</li>
+        </ol>
+      </section>
+    </section>
+  </main>
+
+  <script src="professor.js"></script>
+</body>
+</html>

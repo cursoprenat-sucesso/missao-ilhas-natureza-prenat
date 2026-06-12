@@ -1,499 +1,394 @@
-(function(){
+(() => {
   const app = document.getElementById('app');
-  const resetBtn = document.getElementById('resetProgressBtn');
-  const fileInput = document.getElementById('bankFileInput');
-  const STORAGE_KEY = 'prenat_ilhas_progress_v2';
-  const CUSTOM_BANK_KEY = 'prenat_ilhas_custom_bank_v2';
+  const letters = ['A', 'B', 'C', 'D', 'E'];
+  let settings = null;
+  let questions = [];
+  let progress = null;
+  let currentRun = null;
 
-  let bank = null;
-  let progress = loadProgress();
-  let state = {
-    phaseIndex: null,
-    questionIndex: 0,
-    score: 0,
-    lives: 0,
-    answered: false,
-    selectedIndex: null
+  const DEFAULT_SETTINGS = {
+    slug: 'missao-ilhas-natureza-prenat-v2',
+    brand: 'PRENAT+',
+    missionName: 'Missão Ilhas da Natureza',
+    missionKicker: 'CAMPO DE TREINO PRENAT+',
+    subtitle: 'Uma jornada RPG com questões misturadas de Biologia, Física e Química.',
+    intro: 'Atravesse o arquipélago, conquiste patentes e prove que domina Ciências da Natureza.',
+    studentThemeNote: 'As questões misturam Biologia, Física e Química. As etiquetas são internas do professor.',
+    showMetaToStudent: false,
+    logo: 'logo-prenat.png',
+    ranks: [
+      { name:'Ovo da Travessia', icon:'🥚', description:'Começo da jornada.' },
+      { name:'Filhote do Casco', icon:'🐣', description:'Primeira conquista.' },
+      { name:'Explorador das Marés', icon:'🌊', description:'Avançou na travessia.' },
+      { name:'Guardião da Energia', icon:'⚡', description:'Resiste aos desafios.' },
+      { name:'Navegador da Vida', icon:'🌱', description:'Interpreta contextos.' },
+      { name:'Mestre da Evolução', icon:'🧬', description:'Domina questões fortes.' },
+      { name:'Grande Mestre da Natureza', icon:'🏆', description:'Venceu a missão.' }
+    ],
+    phases: []
   };
 
-  const letters = ['A','B','C','D','E'];
-  const DEFAULT_RANKS = [
-    {title:'Ovo da Travessia', badge:'🥚', message:'Todo mestre começa como um ovo: pequeno, protegido e pronto para romper a casca.'},
-    {title:'Filhote do Casco', badge:'🐣', message:'Você saiu do ovo e começou a caminhar pela trilha.'},
-    {title:'Explorador das Marés', badge:'🌊', message:'Você interpreta melhor os fenômenos do cotidiano.'},
-    {title:'Guardião da Energia', badge:'⚡', message:'Você domina melhor transformações e conservação.'},
-    {title:'Navegador da Vida', badge:'🌱', message:'Você navega por saúde, ambiente e seres vivos.'},
-    {title:'Mestre da Evolução', badge:'🧬', message:'Você encara questões médias e interdisciplinares.'},
-    {title:'Grande Mestre da Natureza', badge:'🏆', message:'Você venceu o Boss Final da trilha.'}
-  ];
+  document.getElementById('resetProgress')?.addEventListener('click', () => {
+    if (!settings) return;
+    if (confirm('Deseja recomeçar esta missão? O progresso salvo neste navegador será apagado.')) {
+      localStorage.removeItem(stateKey());
+      progress = createInitialProgress();
+      renderHome();
+    }
+  });
 
   init();
 
-  async function init(){
-    renderLoading();
-    resetBtn.addEventListener('click', resetProgress);
-    fileInput.addEventListener('change', handleLocalBankUpload);
-    bank = await loadBank();
-    normalizeBank(bank);
-    ensureProgressShape();
-    renderHome();
-  }
-
-  function renderLoading(){
-    const tpl = document.getElementById('loadingTemplate');
-    app.innerHTML = '';
-    app.appendChild(tpl.content.cloneNode(true));
-  }
-
-  async function loadBank(){
-    const custom = localStorage.getItem(CUSTOM_BANK_KEY);
-    if(custom){
-      try { return JSON.parse(custom); } catch(e){ localStorage.removeItem(CUSTOM_BANK_KEY); }
+  async function init() {
+    try {
+      settings = await fetchJson('settings.json', DEFAULT_SETTINGS);
+      questions = await fetchJson('questions.json', []);
+      normalizeData();
+      progress = loadProgress();
+      applyBrand();
+      renderHome();
+    } catch (error) {
+      console.error(error);
+      app.innerHTML = `<section class="result-card glass-card"><div class="result-icon">⚠️</div><h1>Erro ao carregar</h1><p>Não consegui carregar a missão. Confira se os arquivos settings.json e questions.json foram enviados corretamente.</p></section>`;
     }
-    try{
-      const response = await fetch('questions.json', {cache:'no-store'});
-      if(!response.ok) throw new Error('Banco não encontrado');
+  }
+
+  async function fetchJson(url, fallback) {
+    try {
+      const response = await fetch(`${url}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Falha ao buscar ${url}`);
       return await response.json();
-    }catch(err){
-      return JSON.parse(JSON.stringify(window.PRENAT_DEFAULT_BANK || fallbackBank()));
+    } catch (error) {
+      console.warn(`Usando fallback para ${url}`, error);
+      return structuredClone ? structuredClone(fallback) : JSON.parse(JSON.stringify(fallback));
     }
   }
 
-  function fallbackBank(){
-    return {meta:{title:'Missão Ilhas da Natureza'},phases:[]};
+  function normalizeData() {
+    settings = { ...DEFAULT_SETTINGS, ...settings };
+    settings.ranks = Array.isArray(settings.ranks) && settings.ranks.length ? settings.ranks : DEFAULT_SETTINGS.ranks;
+    settings.phases = Array.isArray(settings.phases) ? settings.phases.map((phase, index) => ({
+      id: Number(phase.id || index + 1),
+      name: phase.name || `Ilha ${index + 1}`,
+      title: phase.title || `Fase ${index + 1}`,
+      story: phase.story || 'Vença as questões para desbloquear a próxima etapa.',
+      minPercent: Number(phase.minPercent || 60),
+      lives: Number(phase.lives || 3),
+      questionLimit: Number(phase.questionLimit || 0),
+      shuffle: phase.shuffle !== false,
+      rewardRankIndex: Number(phase.rewardRankIndex ?? Math.min(index + 1, settings.ranks.length - 1)),
+      difficultyLabel: phase.difficultyLabel || 'Treino'
+    })) : [];
+    questions = Array.isArray(questions) ? questions.map((q, index) => normalizeQuestion(q, index)) : [];
   }
 
-  function normalizeBank(input){
-    input.meta = input.meta || {title:'Missão Ilhas da Natureza'};
-    input.meta.ranks = Array.isArray(input.meta.ranks) && input.meta.ranks.length ? input.meta.ranks : DEFAULT_RANKS;
-    input.meta.initialRank = input.meta.initialRank || input.meta.ranks[0] || DEFAULT_RANKS[0];
-    input.phases = Array.isArray(input.phases) ? input.phases : [];
-    input.phases.forEach((phase, index) => {
-      phase.id = phase.id || `fase-${index+1}`;
-      phase.title = phase.title || `Fase ${index+1}`;
-      phase.subtitle = phase.subtitle || 'desafio da trilha';
-      phase.icon = phase.icon || '🏝️';
-      phase.lives = Number(phase.lives || 3);
-      phase.minScore = Number(phase.minScore || 70);
-      phase.story = phase.story || '';
-      const defaultReward = input.meta.ranks[index + 1] || input.meta.ranks[input.meta.ranks.length - 1] || DEFAULT_RANKS[Math.min(index + 1, DEFAULT_RANKS.length - 1)];
-      phase.reward = phase.reward || {};
-      phase.reward.title = phase.reward.title || defaultReward.title || `Conquista da fase ${index+1}`;
-      phase.reward.badge = phase.reward.badge || defaultReward.badge || '🏅';
-      phase.reward.message = phase.reward.message || defaultReward.message || 'Você conquistou uma nova etapa da trilha.';
-      phase.questions = Array.isArray(phase.questions) ? phase.questions : [];
-      phase.questions.forEach((q, qIndex) => {
-        q.id = q.id || `${phase.id}-q${qIndex+1}`;
-        q.options = Array.isArray(q.options) ? q.options.slice(0,5) : [];
-        q.correctIndex = Number(q.correctIndex || 0);
-        q.descriptors = Array.isArray(q.descriptors) ? q.descriptors : [];
-      });
-    });
+  function normalizeQuestion(q, index) {
+    let options = [];
+    if (Array.isArray(q.options)) {
+      options = q.options.map((op, i) => typeof op === 'string'
+        ? { text: op, correct: Number(q.correctIndex) === i, feedback: '' }
+        : { text: op.text || '', correct: Boolean(op.correct), feedback: op.feedback || '' });
+    }
+    if (!options.some(op => op.correct) && Number.isInteger(q.correctIndex) && options[q.correctIndex]) {
+      options[q.correctIndex].correct = true;
+    }
+    return {
+      id: q.id || `q_${index + 1}`,
+      phase: Number(q.phase || 1),
+      discipline: q.discipline || '',
+      topic: q.topic || '',
+      difficulty: q.difficulty || '',
+      statement: q.statement || q.text || '',
+      image: q.image || '',
+      options,
+      explanation: q.explanation || ''
+    };
   }
 
-  function loadProgress(){
-    try{
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {completed:{}, unlocked:{}};
-    }catch(e){
-      return {completed:{}, unlocked:{}};
+  function applyBrand() {
+    document.title = `${settings.brand} | ${settings.missionName}`;
+    const brandName = document.getElementById('brandName');
+    const missionMini = document.getElementById('missionMini');
+    const brandLogo = document.getElementById('brandLogo');
+    if (brandName) brandName.textContent = settings.brand;
+    if (missionMini) missionMini.textContent = settings.missionName;
+    if (brandLogo && settings.logo) brandLogo.src = settings.logo;
+  }
+
+  function stateKey() {
+    return `prenat_rpg_progress_${settings.slug || settings.missionName || 'missao'}`;
+  }
+
+  function createInitialProgress() {
+    return {
+      unlockedPhase: 1,
+      completedPhases: [],
+      rankIndex: 0,
+      phaseScores: {}
+    };
+  }
+
+  function loadProgress() {
+    try {
+      const saved = localStorage.getItem(stateKey());
+      return saved ? { ...createInitialProgress(), ...JSON.parse(saved) } : createInitialProgress();
+    } catch {
+      return createInitialProgress();
     }
   }
 
-  function saveProgress(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  function saveProgress() {
+    localStorage.setItem(stateKey(), JSON.stringify(progress));
   }
 
-  function ensureProgressShape(){
-    progress.completed = progress.completed || {};
-    progress.unlocked = progress.unlocked || {};
-    if(bank.phases[0]) progress.unlocked[bank.phases[0].id] = true;
-    bank.phases.forEach((phase, index) => {
-      if(index === 0) progress.unlocked[phase.id] = true;
-      if(index > 0 && bank.phases[index-1] && progress.completed[bank.phases[index-1].id]){
-        progress.unlocked[phase.id] = true;
-      }
+  function renderHome() {
+    const template = document.getElementById('homeTemplate').content.cloneNode(true);
+    app.innerHTML = '';
+    app.appendChild(template);
+
+    bindText('[data-bind="missionKicker"]', settings.missionKicker);
+    bindText('[data-bind="missionName"]', settings.missionName);
+    bindText('[data-bind="subtitle"]', settings.subtitle);
+    bindText('[data-bind="intro"]', settings.intro);
+    bindText('[data-bind="studentThemeNote"]', settings.studentThemeNote || '');
+
+    renderRankPanel();
+    renderMap();
+
+    app.querySelector('[data-action="continue"]')?.addEventListener('click', () => {
+      const next = settings.phases.find(p => !progress.completedPhases.includes(p.id) && p.id <= progress.unlockedPhase) || settings.phases.find(p => p.id === progress.unlockedPhase) || settings.phases[0];
+      if (next) startPhase(next.id);
     });
-    saveProgress();
+    app.querySelector('[data-action="view-map"]')?.addEventListener('click', () => document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' }));
   }
 
-  function resetProgress(){
-    if(!confirm('Deseja reiniciar o progresso deste navegador?')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    progress = loadProgress();
-    ensureProgressShape();
-    renderHome();
+  function bindText(selector, text) {
+    const el = app.querySelector(selector);
+    if (el) el.textContent = text ?? '';
   }
 
-  function completedCount(){
-    return bank.phases.filter(p => progress.completed[p.id]).length;
+  function renderRankPanel() {
+    const rank = settings.ranks[Math.min(progress.rankIndex || 0, settings.ranks.length - 1)] || settings.ranks[0];
+    const completedCount = progress.completedPhases.length;
+    const total = settings.phases.length || 1;
+    const percent = Math.round((completedCount / total) * 100);
+    const nextPhase = settings.phases.find(p => !progress.completedPhases.includes(p.id));
+    const nextRank = nextPhase ? settings.ranks[nextPhase.rewardRankIndex] : null;
+
+    app.querySelector('[data-rank-icon]').textContent = rank.icon || '🥚';
+    app.querySelector('[data-rank-name]').textContent = rank.name || 'Patente inicial';
+    app.querySelector('[data-rank-description]').textContent = rank.description || '';
+    app.querySelector('[data-progress-text]').textContent = `${percent}%`;
+    app.querySelector('[data-progress-caption]').textContent = nextRank
+      ? `${completedCount} de ${total} ilhas concluídas · próxima patente: ${nextRank.name}`
+      : `${completedCount} de ${total} ilhas concluídas · missão completa`;
+    const circle = app.querySelector('[data-progress-circle]');
+    if (circle) circle.style.strokeDashoffset = String(314 - (314 * percent / 100));
   }
 
-  function rankForCompleted(count){
-    const ranks = bank.meta?.ranks || DEFAULT_RANKS;
-    const safeIndex = Math.max(0, Math.min(Number(count || 0), ranks.length - 1));
-    return ranks[safeIndex] || DEFAULT_RANKS[0];
-  }
-
-  function rewardForPhase(index){
-    const phase = bank.phases[index] || {};
-    return phase.reward || rankForCompleted(index + 1);
-  }
-
-  function renderHome(){
-    const total = bank.phases.length || 1;
-    const completed = completedCount();
-    const percent = Math.round((completed / total) * 100);
-    const nextPhase = bank.phases.find(p => progress.unlocked[p.id] && !progress.completed[p.id]) || bank.phases[bank.phases.length-1];
-    const currentRank = rankForCompleted(completed);
-    const nextRank = rankForCompleted(Math.min(completed + 1, total));
-
-    app.innerHTML = `
-      <section class="hero">
-        <div class="hero-card">
-          <p class="eyebrow">trilha gamificada</p>
-          <h1>Ilhas da Natureza</h1>
-          <p>Avance pelo arquipélago PRENAT+: vença uma ilha, desbloqueie a próxima e chegue ao Boss Final sem perder todas as vidas.</p>
-          <div class="hero-actions">
-            <button class="primary-btn" id="continueBtn" type="button">Continuar missão</button>
-            <button class="secondary-btn" id="loadBankBtn" type="button">Carregar banco JSON local</button>
-          </div>
+  function renderMap() {
+    const map = app.querySelector('[data-island-map]');
+    const story = app.querySelector('[data-map-story]');
+    if (story) story.textContent = 'Cada ilha é uma etapa de dificuldade progressiva. As questões misturam as três áreas de Ciências da Natureza.';
+    if (!map) return;
+    map.innerHTML = '';
+    settings.phases.forEach((phase, index) => {
+      const unlocked = phase.id <= progress.unlockedPhase;
+      const completed = progress.completedPhases.includes(phase.id);
+      const phaseQuestions = getQuestionsForPhase(phase.id);
+      const rank = settings.ranks[phase.rewardRankIndex] || {};
+      const card = document.createElement('article');
+      card.className = `island-card ${unlocked ? '' : 'locked'}`;
+      card.innerHTML = `
+        ${completed ? '<span class="completed-ribbon">CONQUISTADA</span>' : ''}
+        <span class="lock-badge">${unlocked ? (completed ? '✓' : 'Aberta') : '🔒'}</span>
+        <div class="island-art">
+          <div class="island-orb"></div>
+          <div class="island-icon">${index === settings.phases.length - 1 ? '🐉' : (rank.icon || '🏝️')}</div>
         </div>
-        <aside class="status-card">
-          <div class="mascot-badge">${escapeHtml(currentRank.badge || '🐢')}</div>
-          <div class="rank-box">
-            <span class="rank-label">patente atual</span>
-            <strong>${escapeHtml(currentRank.title || 'Ovo da Travessia')}</strong>
-            <small>${escapeHtml(currentRank.message || '')}</small>
-          </div>
-          <div class="progress-ring" style="--progress:${percent}%"><span>${percent}%</span></div>
-          <small>${completed} de ${total} ilhas concluídas · próxima patente: ${escapeHtml(nextRank.title || 'conquista final')}</small>
-        </aside>
-      </section>
-
-      <section class="phase-map">
-        <div class="map-header">
-          <div>
-            <h2>Mapa do arquipélago</h2>
-            <p>Cada ilha é uma fase. As ilhas com cadeado só abrem após vencer a anterior.</p>
-          </div>
-          <span class="pill">${bank.meta?.title || 'PRENAT+'}</span>
-        </div>
-        <div class="story-strip">${escapeHtml(nextPhase?.story || 'Escolha uma ilha desbloqueada para começar.')}</div>
-        <div class="island-grid">
-          ${bank.phases.map((phase, index) => islandCard(phase, index)).join('')}
-        </div>
-      </section>
-    `;
-
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      const idx = Math.max(0, bank.phases.findIndex(p => p.id === nextPhase?.id));
-      startPhase(idx);
-    });
-    document.getElementById('loadBankBtn').addEventListener('click', () => fileInput.click());
-    app.querySelectorAll('[data-start-phase]').forEach(btn => {
-      btn.addEventListener('click', () => startPhase(Number(btn.dataset.startPhase)));
-    });
-    typeset();
-  }
-
-  function islandCard(phase, index){
-    const unlocked = !!progress.unlocked[phase.id];
-    const completed = !!progress.completed[phase.id];
-    const status = completed ? 'concluída' : unlocked ? 'liberada' : 'bloqueada';
-    const statusClass = completed ? 'completed' : unlocked ? '' : 'locked';
-    const questionCount = phase.questions.length;
-    return `
-      <article class="island-card ${unlocked ? 'unlocked' : 'locked'}">
-        <div class="island-top">
-          <div class="island-icon" aria-hidden="true">${escapeHtml(phase.icon || '🏝️')}</div>
-          <span class="island-status ${statusClass}">${completed ? '✓ ' : unlocked ? '• ' : '🔒 '}${status}</span>
-        </div>
-        <div class="island-content">
-          <h3>${index+1}. ${escapeHtml(phase.title)}</h3>
-          <p>${escapeHtml(phase.subtitle || '')}</p>
+        <div>
+          <span class="tiny-label">${escapeHtml(phase.name)}</span>
+          <h3>${escapeHtml(phase.title)}</h3>
+          <p>${escapeHtml(phase.story)}</p>
           <div class="island-meta">
-            <span class="pill">${phase.lives} vidas</span>
-            <span class="pill">${phase.minScore}% para passar</span>
-            <span class="pill">${questionCount} questões</span>
-            <span class="pill reward-pill">${escapeHtml(phase.reward?.badge || '🏅')} ${escapeHtml(phase.reward?.title || 'Conquista')}</span>
+            <span class="meta-chip">Meta ${phase.minPercent}%</span>
+            <span class="meta-chip">${phase.lives} vidas</span>
+            <span class="meta-chip">${phase.questionLimit ? `até ${phase.questionLimit}` : 'todas'} questões</span>
+            <span class="meta-chip">${escapeHtml(phase.difficultyLabel)}</span>
           </div>
+          <button class="btn ${unlocked ? 'btn-primary' : 'btn-soft'}" ${unlocked && phaseQuestions.length ? '' : 'disabled'} data-start-phase="${phase.id}">
+            ${completed ? 'Refazer ilha' : unlocked ? 'Entrar na ilha' : 'Bloqueada'}
+          </button>
+          ${unlocked && !phaseQuestions.length ? '<p class="small-muted">Ilha em preparação: ainda não há questões cadastradas.</p>' : ''}
         </div>
-        <button class="${unlocked ? 'primary-btn' : 'secondary-btn'}" type="button" ${unlocked ? `data-start-phase="${index}"` : 'disabled'}>
-          ${completed ? 'Refazer ilha' : unlocked ? 'Entrar na ilha' : 'Bloqueada'}
-        </button>
-      </article>
-    `;
+      `;
+      map.appendChild(card);
+    });
+    map.querySelectorAll('[data-start-phase]').forEach(btn => btn.addEventListener('click', () => startPhase(Number(btn.dataset.startPhase))));
   }
 
-  function startPhase(index){
-    const phase = bank.phases[index];
-    if(!phase || !progress.unlocked[phase.id]) return;
-    if(!phase.questions.length){
-      renderNoQuestions(phase, index);
-      return;
+  function getQuestionsForPhase(phaseId) {
+    return questions.filter(q => Number(q.phase) === Number(phaseId) && q.statement && q.options.length >= 2 && q.options.some(op => op.correct));
+  }
+
+  function startPhase(phaseId) {
+    const phase = settings.phases.find(p => p.id === phaseId);
+    if (!phase || phase.id > progress.unlockedPhase) return renderHome();
+    let phaseQuestions = getQuestionsForPhase(phase.id);
+    if (!phaseQuestions.length) {
+      alert('Esta ilha ainda não possui questões cadastradas.');
+      return renderHome();
     }
-    state = {
-      phaseIndex:index,
-      questionIndex:0,
-      score:0,
-      lives:Number(phase.lives || 3),
-      answered:false,
-      selectedIndex:null
+    if (phase.shuffle) phaseQuestions = shuffleArray(phaseQuestions);
+    if (phase.questionLimit && phase.questionLimit > 0) phaseQuestions = phaseQuestions.slice(0, phase.questionLimit);
+    currentRun = {
+      phase,
+      questions: phaseQuestions,
+      index: 0,
+      lives: phase.lives,
+      score: 0,
+      answered: false
     };
     renderQuestion();
   }
 
-  function renderNoQuestions(phase, index){
-    const reward = phase.reward || rewardForPhase(index);
-    app.innerHTML = `
-      <section class="result-card">
-        <div class="score-badge">${escapeHtml(phase.icon || '🏝️')}</div>
-        <p class="eyebrow">ilha em construção</p>
-        <h1>${escapeHtml(phase.title)}</h1>
-        <p>Esta ilha ainda não tem questões cadastradas. Abra a Área do Professor, cadastre as questões e baixe o novo <strong>questions.json</strong>.</p>
-        <div class="reward-card locked-reward">
-          <span class="reward-emoji">${escapeHtml(reward.badge || '🏅')}</span>
-          <div>
-            <span class="rank-label">recompensa planejada</span>
-            <strong>${escapeHtml(reward.title || 'Nova conquista')}</strong>
-            <p>${escapeHtml(reward.message || 'Mensagem exibida quando o aluno vencer esta ilha.')}</p>
-          </div>
-        </div>
-        <div class="result-actions">
-          <a class="primary-btn" href="editor.html">Abrir editor</a>
-          <button class="secondary-btn" id="backMapBtn" type="button">Voltar ao mapa</button>
-        </div>
-      </section>
-    `;
-    document.getElementById('backMapBtn').addEventListener('click', renderHome);
-  }
+  function renderQuestion() {
+    const run = currentRun;
+    const q = run.questions[run.index];
+    const template = document.getElementById('quizTemplate').content.cloneNode(true);
+    app.innerHTML = '';
+    app.appendChild(template);
+    app.querySelector('[data-action="back-home"]')?.addEventListener('click', renderHome);
 
-  function renderQuestion(){
-    const phase = bank.phases[state.phaseIndex];
-    const q = phase.questions[state.questionIndex];
-    const total = phase.questions.length;
-    const progressWidth = ((state.questionIndex) / total) * 100;
+    app.querySelector('[data-phase-title]').textContent = run.phase.title;
+    app.querySelector('[data-phase-story]').textContent = run.phase.story;
+    app.querySelector('[data-lives]').textContent = '❤️'.repeat(run.lives) || '0';
+    app.querySelector('[data-minpercent]').textContent = `${run.phase.minPercent}%`;
+    app.querySelector('[data-score]').textContent = `${run.score}/${run.questions.length}`;
+    app.querySelector('[data-question-count]').textContent = `Questão ${run.index + 1} de ${run.questions.length}`;
+    app.querySelector('[data-quiz-progress]').style.width = `${(run.index / run.questions.length) * 100}%`;
+    app.querySelector('[data-question-index]').textContent = `Questão ${run.index + 1}`;
+    app.querySelector('[data-question-meta]').textContent = settings.showMetaToStudent
+      ? [q.discipline, q.topic, q.difficulty].filter(Boolean).join(' · ')
+      : 'Ciências da Natureza';
+    app.querySelector('[data-question-statement]').innerHTML = q.statement;
 
-    app.innerHTML = `
-      <section class="quiz-card">
-        <div class="quiz-top">
-          <div>
-            <p class="eyebrow">${escapeHtml(phase.title)}</p>
-            <h1>Questão ${state.questionIndex + 1} de ${total}</h1>
-            <p class="quiz-sub">Meta da ilha: ${phase.minScore}% ou mais, mantendo pelo menos 1 vida. Recompensa: ${escapeHtml(phase.reward?.badge || '🏅')} ${escapeHtml(phase.reward?.title || 'nova patente')}.</p>
-          </div>
-          <div class="lives" title="vidas restantes">${renderLives(state.lives, phase.lives)}</div>
-        </div>
-        <div class="quiz-progress"><span style="width:${progressWidth}%"></span></div>
-        <div class="question-meta">
-          <span class="pill">${escapeHtml(q.discipline || 'Natureza')}</span>
-          <span class="pill">${escapeHtml(q.topic || 'Tema')}</span>
-          <span class="pill">Pontuação: ${state.score}/${state.questionIndex}</span>
-        </div>
-        <div class="question-text">${sanitizeRich(q.text || '')}</div>
-        ${q.image ? `<img class="question-image" src="${escapeAttr(q.image)}" alt="Imagem da questão" loading="lazy">` : ''}
-        <div class="options">
-          ${(q.options || []).map((opt, i) => `
-            <button class="option-btn" type="button" data-option="${i}">
-              <span class="option-letter">${letters[i] || i+1}</span>
-              <span>${sanitizeRich(opt)}</span>
-            </button>
-          `).join('')}
-        </div>
-        <div id="feedbackSlot"></div>
-        <div class="quiz-footer">
-          <button class="secondary-btn" id="quitBtn" type="button">Voltar ao mapa</button>
-          <button class="primary-btn" id="nextBtn" type="button" disabled>Próxima</button>
-        </div>
-      </section>
-    `;
-
-    document.getElementById('quitBtn').addEventListener('click', renderHome);
-    document.getElementById('nextBtn').addEventListener('click', nextQuestion);
-    app.querySelectorAll('[data-option]').forEach(btn => {
-      btn.addEventListener('click', () => answerQuestion(Number(btn.dataset.option)));
-    });
-    typeset();
-  }
-
-  function answerQuestion(selectedIndex){
-    if(state.answered) return;
-    const phase = bank.phases[state.phaseIndex];
-    const q = phase.questions[state.questionIndex];
-    const correct = Number(q.correctIndex) === selectedIndex;
-    state.answered = true;
-    state.selectedIndex = selectedIndex;
-    if(correct){
-      state.score += 1;
-    }else{
-      state.lives -= 1;
+    const imgWrap = app.querySelector('[data-question-image-wrap]');
+    const img = app.querySelector('[data-question-image]');
+    if (q.image) {
+      img.src = q.image;
+      imgWrap.classList.add('visible');
     }
 
-    app.querySelectorAll('[data-option]').forEach(btn => {
-      const idx = Number(btn.dataset.option);
-      btn.disabled = true;
-      if(idx === Number(q.correctIndex)) btn.classList.add('correct');
-      if(idx === selectedIndex && !correct) btn.classList.add('wrong');
+    const list = app.querySelector('[data-options-list]');
+    q.options.forEach((op, i) => {
+      const button = document.createElement('button');
+      button.className = 'option-btn';
+      button.innerHTML = `<span class="option-letter">${letters[i] || i + 1}</span><span>${op.text}</span>`;
+      button.addEventListener('click', () => answerQuestion(i));
+      list.appendChild(button);
+    });
+    typesetMath();
+  }
+
+  function answerQuestion(selectedIndex) {
+    const run = currentRun;
+    if (run.answered) return;
+    run.answered = true;
+    const q = run.questions[run.index];
+    const selected = q.options[selectedIndex];
+    const correctIndex = q.options.findIndex(op => op.correct);
+    const isCorrect = Boolean(selected?.correct);
+    if (isCorrect) run.score += 1;
+    else run.lives = Math.max(0, run.lives - 1);
+
+    app.querySelector('[data-lives]').textContent = '❤️'.repeat(run.lives) || '0';
+    app.querySelector('[data-score]').textContent = `${run.score}/${run.questions.length}`;
+    app.querySelectorAll('.option-btn').forEach((btn, i) => {
+      btn.classList.add('disabled');
+      if (i === correctIndex) btn.classList.add('correct');
+      if (i === selectedIndex && !isCorrect) btn.classList.add('wrong');
     });
 
-    const feedback = document.getElementById('feedbackSlot');
-    feedback.innerHTML = `
-      <div class="feedback">
-        <h3>${correct ? 'Resposta correta!' : 'Resposta incorreta'}</h3>
-        <p><strong>Gabarito: ${letters[q.correctIndex] || q.correctIndex + 1}.</strong> ${sanitizeRich(q.explanation || 'Sem comentário cadastrado.')}</p>
-        ${renderDescriptors(q)}
-      </div>
-    `;
-    const nextBtn = document.getElementById('nextBtn');
-    nextBtn.disabled = false;
-    nextBtn.textContent = state.lives <= 0 ? 'Ver resultado' : (state.questionIndex + 1 >= phase.questions.length ? 'Finalizar ilha' : 'Próxima');
-    typeset();
+    const panel = app.querySelector('[data-feedback-panel]');
+    panel.classList.remove('hidden');
+    app.querySelector('[data-feedback-title]').textContent = isCorrect ? 'Resposta correta!' : 'Quase! Observe a armadilha.';
+    app.querySelector('[data-feedback-text]').innerHTML = q.explanation || (isCorrect ? 'Você marcou a alternativa correta.' : 'Leia o comentário da alternativa e tente identificar o erro conceitual.');
+    app.querySelector('[data-feedback-descriptor]').innerHTML = selected?.feedback || '';
+    const nextButton = app.querySelector('[data-action="next-question"]');
+    nextButton.textContent = run.lives <= 0 ? 'Ver resultado' : (run.index >= run.questions.length - 1 ? 'Concluir ilha' : 'Próxima questão');
+    nextButton.addEventListener('click', nextStep);
+    typesetMath();
   }
 
-  function renderDescriptors(q){
-    if(!q.descriptors || !q.descriptors.length) return '';
-    return `
-      <div class="descriptor-list">
-        ${q.descriptors.map((d, i) => `<div class="descriptor"><strong>${letters[i] || i+1})</strong> ${sanitizeRich(d)}</div>`).join('')}
-      </div>
-    `;
-  }
-
-  function nextQuestion(){
-    const phase = bank.phases[state.phaseIndex];
-    if(state.lives <= 0 || state.questionIndex + 1 >= phase.questions.length){
-      renderResult();
-      return;
-    }
-    state.questionIndex += 1;
-    state.answered = false;
-    state.selectedIndex = null;
+  function nextStep() {
+    if (currentRun.lives <= 0 || currentRun.index >= currentRun.questions.length - 1) return finishPhase();
+    currentRun.index += 1;
+    currentRun.answered = false;
     renderQuestion();
   }
 
-  function renderResult(){
-    const phase = bank.phases[state.phaseIndex];
-    const total = phase.questions.length || 1;
-    const percent = Math.round((state.score / total) * 100);
-    const passed = percent >= Number(phase.minScore || 70) && state.lives > 0;
-    if(passed){
-      progress.completed[phase.id] = true;
-      const nextPhase = bank.phases[state.phaseIndex + 1];
-      if(nextPhase) progress.unlocked[nextPhase.id] = true;
+  function finishPhase() {
+    const run = currentRun;
+    const percent = Math.round((run.score / run.questions.length) * 100);
+    const passed = run.lives > 0 && percent >= run.phase.minPercent;
+    const previousRank = settings.ranks[progress.rankIndex] || settings.ranks[0];
+    const nextRank = settings.ranks[run.phase.rewardRankIndex] || previousRank;
+
+    if (passed) {
+      if (!progress.completedPhases.includes(run.phase.id)) progress.completedPhases.push(run.phase.id);
+      progress.unlockedPhase = Math.max(progress.unlockedPhase, run.phase.id + 1);
+      progress.rankIndex = Math.max(progress.rankIndex, run.phase.rewardRankIndex || 0);
+      progress.phaseScores[run.phase.id] = { score: run.score, total: run.questions.length, percent, date: new Date().toISOString() };
       saveProgress();
     }
-    const previousRank = rankForCompleted(Math.max(0, state.phaseIndex));
-    const reward = rewardForPhase(state.phaseIndex);
-    const finalVictory = passed && state.phaseIndex + 1 >= bank.phases.length;
-    app.innerHTML = `
-      <section class="result-card ${passed ? 'victory' : 'defeat'}">
-        <div class="score-badge">${passed ? escapeHtml(reward.badge || '🏅') : percent + '%'}</div>
-        <p class="eyebrow">${escapeHtml(phase.title)}</p>
-        <h1>${passed ? (finalVictory ? 'Travessia concluída!' : 'Ilha conquistada!') : state.lives <= 0 ? 'Game over na ilha' : 'Quase lá!'}</h1>
-        <p>${passed ? `Você fez ${state.score} de ${total} e venceu a ilha. A próxima etapa foi desbloqueada.` : `Você fez ${state.score} de ${total}. Para passar nesta ilha, precisava de pelo menos ${phase.minScore}% e não poderia perder todas as vidas.`}</p>
-        ${passed ? `
-          <div class="reward-card">
-            <span class="reward-emoji">${escapeHtml(reward.badge || '🏅')}</span>
-            <div>
-              <span class="rank-label">nova patente desbloqueada</span>
-              <strong>${escapeHtml(reward.title || 'Nova conquista')}</strong>
-              <p>${escapeHtml(reward.message || 'Você avançou na trilha PRENAT+.')}</p>
-              <small>Antes: ${escapeHtml(previousRank.title || 'Ovo da Travessia')} → Agora: ${escapeHtml(reward.title || 'Nova conquista')}</small>
-            </div>
-          </div>
-        ` : `
-          <div class="reward-card locked-reward">
-            <span class="reward-emoji">🔒</span>
-            <div>
-              <span class="rank-label">patente ainda bloqueada</span>
-              <strong>${escapeHtml(reward.title || 'Nova conquista')}</strong>
-              <p>Refaça a ilha, proteja suas vidas e alcance a meta para liberar esta conquista.</p>
-            </div>
-          </div>
-        `}
-        <p><strong>Vidas restantes:</strong> ${renderLives(state.lives, phase.lives)}</p>
-        <div class="result-actions">
-          ${passed && bank.phases[state.phaseIndex + 1] ? '<button class="primary-btn" id="nextPhaseBtn" type="button">Ir para próxima ilha</button>' : ''}
-          ${finalVictory ? '<button class="primary-btn" id="mapBtnVictory" type="button">Ver mapa concluído</button>' : ''}
-          <button class="secondary-btn" id="retryBtn" type="button">Refazer esta ilha</button>
-          <button class="secondary-btn" id="mapBtn" type="button">Voltar ao mapa</button>
-        </div>
-      </section>
-    `;
-    const nextPhaseBtn = document.getElementById('nextPhaseBtn');
-    if(nextPhaseBtn) nextPhaseBtn.addEventListener('click', () => startPhase(state.phaseIndex + 1));
-    const mapBtnVictory = document.getElementById('mapBtnVictory');
-    if(mapBtnVictory) mapBtnVictory.addEventListener('click', renderHome);
-    document.getElementById('retryBtn').addEventListener('click', () => startPhase(state.phaseIndex));
-    document.getElementById('mapBtn').addEventListener('click', renderHome);
-    typeset();
+    renderResult({ passed, percent, previousRank, nextRank, run });
   }
 
-  function renderLives(current, total){
-    return Array.from({length: Number(total || 3)}, (_, i) => i < current ? '❤️' : '🖤').join(' ');
-  }
+  function renderResult({ passed, percent, previousRank, nextRank, run }) {
+    const template = document.getElementById('resultTemplate').content.cloneNode(true);
+    app.innerHTML = '';
+    app.appendChild(template);
+    app.querySelector('[data-result-icon]').textContent = passed ? (nextRank.icon || '🏆') : '💔';
+    app.querySelector('[data-result-kicker]').textContent = passed ? 'Ilha conquistada' : 'Game over da ilha';
+    app.querySelector('[data-result-title]').textContent = passed ? 'Você passou de fase!' : 'A travessia ainda não foi concluída';
+    app.querySelector('[data-result-message]').textContent = passed
+      ? `Você venceu ${run.phase.title} e desbloqueou a próxima etapa da missão.`
+      : `Você fez ${percent}% e precisava de ${run.phase.minPercent}% sem perder todas as vidas. Reforce os pontos fracos e tente novamente.`;
+    app.querySelector('[data-result-score]').textContent = `${run.score}/${run.questions.length}`;
+    app.querySelector('[data-result-percent]').textContent = `${percent}%`;
+    app.querySelector('[data-result-target]').textContent = `${run.phase.minPercent}%`;
+    app.querySelector('[data-rank-unlock]').innerHTML = passed
+      ? `<span class="tiny-label">Nova patente desbloqueada</span><br><strong>${escapeHtml(previousRank.name)} → ${escapeHtml(nextRank.name)}</strong><p>${escapeHtml(nextRank.description || '')}</p>`
+      : `<strong>Patente bloqueada:</strong> vença a ilha para conquistar ${escapeHtml(nextRank.name || 'a próxima patente')}.`;
 
-  function handleLocalBankUpload(event){
-    const file = event.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const parsed = JSON.parse(reader.result);
-        normalizeBank(parsed);
-        localStorage.setItem(CUSTOM_BANK_KEY, JSON.stringify(parsed));
-        bank = parsed;
-        progress = loadProgress();
-        ensureProgressShape();
-        renderHome();
-        toast('Banco carregado neste navegador.', 'success');
-      }catch(err){
-        toast('Não consegui ler esse JSON. Verifique se exportou pelo editor.', 'error');
-      }finally{
-        fileInput.value = '';
+    const mainButton = app.querySelector('[data-action="result-main"]');
+    mainButton.textContent = passed ? 'Ir para próxima ilha' : 'Tentar novamente';
+    mainButton.addEventListener('click', () => {
+      if (passed) {
+        const nextPhase = settings.phases.find(p => p.id === run.phase.id + 1);
+        nextPhase ? startPhase(nextPhase.id) : renderHome();
+      } else {
+        startPhase(run.phase.id);
       }
-    };
-    reader.readAsText(file);
+    });
+    app.querySelector('[data-action="back-home"]')?.addEventListener('click', renderHome);
   }
 
-  function toast(message, type=''){
-    const el = document.createElement('div');
-    el.className = `toast ${type}`;
-    el.textContent = message;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3600);
-  }
-
-  function typeset(){
-    if(window.MathJax && window.MathJax.typesetPromise){
-      window.MathJax.typesetPromise([app]).catch(() => {});
+  function shuffleArray(array) {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
     }
+    return copy;
   }
 
-  function sanitizeRich(value){
-    const raw = String(value ?? '');
-    const allowed = ['sub','sup','strong','b','em','i','br','u'];
-    const template = document.createElement('template');
-    template.innerHTML = raw;
-    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_ELEMENT);
-    const toRemove = [];
-    while(walker.nextNode()){
-      const node = walker.currentNode;
-      const tag = node.tagName.toLowerCase();
-      if(!allowed.includes(tag)){
-        toRemove.push(node);
-      }else{
-        [...node.attributes].forEach(attr => node.removeAttribute(attr.name));
-      }
-    }
-    toRemove.forEach(node => node.replaceWith(document.createTextNode(node.textContent || '')));
-    return template.innerHTML;
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#039;', '"':'&quot;' }[char]));
   }
 
-  function escapeHtml(value){
-    return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  }
-  function escapeAttr(value){
-    return escapeHtml(value).replace(/`/g, '&#96;');
+  function typesetMath() {
+    if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise().catch(() => {});
   }
 })();
