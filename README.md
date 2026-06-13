@@ -36,8 +36,8 @@ Esta versão força o navegador a carregar novos arquivos: `app-tartarugas-v8.js
 - Mantido todo o restante do fluxo do professor e do aluno.
 
 
-## V15 Definitivo
-- Esta versão é completa e usa arquivos com nomes novos: `app-v15-final.js`, `style-v15-final.css` e `professor-v15-final.js`.
-- O Boss Final usa um ícone explícito com **🏆 + 🦈**.
-- As fontes ficam na aba **2. Configurar missão** do professor.
-- Suba todos os arquivos da pasta para evitar mistura com versões antigas.
+## V16 Boss corrigido
+- Correção definitiva: o campo `iconStage` agora é preservado quando o jogo normaliza as fases.
+- Com isso, o Boss Final usa de fato o estágio 6, com troféu + tubarão.
+- `index.html` chama `app-v16-final.js` e `style-v16-final.css`.
+- `professor.html` chama `professor-v16-final.js`.

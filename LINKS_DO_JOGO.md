@@ -32,4 +32,4 @@ Atualização V8: se o navegador mostrar a versão antiga, use `?v=8` no final d
 Atualização recomendada após subir a V11: abra o link do aluno com `?v=11` no final e use `Ctrl + F5`.
 
 
-Teste da V15: abra o aluno com `?v=15` e use Ctrl+F5. Professor: `professor.html?v=15`.
+Teste da V16: adicione `?v=16` ao link do aluno e use Ctrl + F5.
