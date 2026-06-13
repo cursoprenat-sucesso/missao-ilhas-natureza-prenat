@@ -3,36 +3,32 @@
   let settings = null;
   let questions = [];
 
-  const FONT_OPTIONS = ['inter','arial','trebuchet','verdana','georgia','times','palatino'];
-
   const DEFAULT_SETTINGS = {
-    slug: 'missao-ilhas-natureza-prenat-v7-tartarugas',
+    slug: 'missao-ilhas-natureza-prenat-v2',
     brand: 'PRENAT+',
     missionName: 'Missão Ilhas da Natureza',
     missionKicker: 'CAMPO DE TREINO PRENAT+',
-    subtitle: 'Uma travessia leve e estratégica com desafios progressivos de Ciências da Natureza.',
-    intro: 'Você vai atravessar ilhas, vencer desafios mistos de Biologia, Física e Química e evoluir de ovo a mestre da travessia.',
-    studentThemeNote: 'Cada rodada sorteia questões do banco da ilha. Tente novamente quando precisar: o treino muda, e sua estratégia melhora.',
+    subtitle: 'Uma jornada RPG com questões misturadas de Biologia, Física e Química.',
+    intro: 'Atravesse o arquipélago, conquiste patentes e prove que domina Ciências da Natureza sem perder todas as vidas.',
+    studentThemeNote: 'As questões misturam Biologia, Física e Química. As etiquetas são internas do professor.',
     showMetaToStudent: false,
     logo: 'logo-prenat.png',
-    fontBodyKey: 'inter',
-    fontHeadingKey: 'inter',
     ranks: [
-      { name:'Ovo da Travessia', icon:'🥚', visualStage:0, description:'Você ainda está no início da jornada. A casca protege sua preparação antes da primeira ilha.' },
-      { name:'Filhote do Casco', icon:'🐢', visualStage:1, description:'Você saiu do ovo, rompeu a primeira casca e virou Filhote do Casco.' },
-      { name:'Explorador das Marés', icon:'🐢', visualStage:2, description:'Você já encara a travessia com mais segurança e começa a reconhecer os caminhos da prova.' },
-      { name:'Guardião da Travessia', icon:'🐢', visualStage:3, description:'Você sustenta o foco diante de armadilhas, gráficos e alternativas parecidas.' },
-      { name:'Navegador da Resistência', icon:'🐢', visualStage:4, description:'Você atravessa questões maiores, interpreta dados e mantém calma até o fim.' },
-      { name:'Mestre da Travessia', icon:'🐢', visualStage:5, description:'Você domina etapas exigentes, elimina distratores fortes e conduz a própria evolução.' },
-      { name:'Grande Mestre da Natureza', icon:'🐢', visualStage:6, description:'Você venceu o Boss Final e concluiu a travessia PRENAT+ como Grande Mestre da Natureza.' }
+      { name:'Ovo da Travessia', icon:'🥚', description:'Começo da jornada. A casca ainda protege o aluno antes da primeira ilha.' },
+      { name:'Filhote do Casco', icon:'🐣', description:'A primeira conquista. O aluno rompeu a casca e entrou no arquipélago.' },
+      { name:'Explorador das Marés', icon:'🌊', description:'Já atravessa conceitos básicos e começa a reconhecer padrões de prova.' },
+      { name:'Guardião da Energia', icon:'⚡', description:'Aprendeu a resistir às questões médias e interpretar situações científicas.' },
+      { name:'Navegador da Vida', icon:'🌱', description:'Consegue ligar fenômenos, dados, gráficos e contextos do cotidiano.' },
+      { name:'Mestre da Evolução', icon:'🧬', description:'Domina questões mais densas, interdisciplinares e com distratores fortes.' },
+      { name:'Grande Mestre da Natureza', icon:'🏆', description:'Venceu o Boss Final e concluiu a travessia PRENAT+.' }
     ],
     phases: [
-      { id:1, name:'Ilha 1', title:'Rompendo a Casca', story:'Nesta primeira ilha, você vai aquecer a mente com questões básicas e misturadas de Natureza. Para avançar, mantenha o foco, proteja suas vidas e supere a meta.', minPercent:60, lives:3, questionLimit:10, shuffle:true, rewardRankIndex:1, difficultyLabel:'Aquecimento' },
-      { id:2, name:'Ilha 2', title:'Caminho do Filhote', story:'Nesta ilha, você vai enfrentar enunciados um pouco mais interpretativos, alternativas parecidas e conceitos que pedem atenção.', minPercent:65, lives:3, questionLimit:15, shuffle:true, rewardRankIndex:2, difficultyLabel:'Base + interpretação' },
-      { id:3, name:'Ilha 3', title:'Mar das Estratégias', story:'Agora você vai cruzar gráficos, comparações, contextos do cotidiano e armadilhas típicas de prova.', minPercent:70, lives:3, questionLimit:20, shuffle:true, rewardRankIndex:3, difficultyLabel:'Intermediário' },
-      { id:4, name:'Ilha 4', title:'Trilha da Resistência', story:'Aqui a resistência aumenta: você vai lidar com textos maiores, ideias combinadas e decisões que exigem calma até o fim.', minPercent:75, lives:3, questionLimit:30, shuffle:true, rewardRankIndex:4, difficultyLabel:'Médio-forte' },
-      { id:5, name:'Ilha 5', title:'Templo da Evolução', story:'Nesta ilha, você vai encarar questões mais profundas, distratores fortes e raciocínio mais exigente.', minPercent:80, lives:4, questionLimit:35, shuffle:true, rewardRankIndex:5, difficultyLabel:'Avançado' },
-      { id:6, name:'Boss Final', title:'Grande Batalha da Natureza', story:'Chegou o Boss Final. Você vai enfrentar questões hard, integradas e com cara de prova. Supere a meta final e conclua a travessia.', minPercent:80, lives:4, questionLimit:45, shuffle:true, rewardRankIndex:6, difficultyLabel:'Hard final' }
+      { id:1, name:'Ilha 1', title:'Rompendo a Casca', story:'A tartaruga PRENAT+ chegou à primeira ilha. O desafio é vencer questões básicas misturadas de Natureza.', minPercent:60, lives:3, questionLimit:10, shuffle:true, rewardRankIndex:1, difficultyLabel:'Aquecimento' },
+      { id:2, name:'Ilha 2', title:'Caminho do Filhote', story:'O aluno avança para questões um pouco mais interpretativas, ainda com base conceitual forte.', minPercent:65, lives:3, questionLimit:20, shuffle:true, rewardRankIndex:2, difficultyLabel:'Base + interpretação' },
+      { id:3, name:'Ilha 3', title:'Mar das Estratégias', story:'Agora o jogo exige leitura cuidadosa, comparação de dados e identificação de armadilhas.', minPercent:70, lives:3, questionLimit:30, shuffle:true, rewardRankIndex:3, difficultyLabel:'Intermediário' },
+      { id:4, name:'Ilha 4', title:'Trilha da Resistência', story:'A travessia fica mais intensa: textos maiores, gráficos e situações com mais de um conceito envolvido.', minPercent:75, lives:3, questionLimit:45, shuffle:true, rewardRankIndex:4, difficultyLabel:'Médio-forte' },
+      { id:5, name:'Ilha 5', title:'Templo da Evolução', story:'O aluno enfrenta questões mais profundas, com maior cobrança de raciocínio e eliminação de distratores.', minPercent:80, lives:4, questionLimit:60, shuffle:true, rewardRankIndex:5, difficultyLabel:'Avançado' },
+      { id:6, name:'Boss Final', title:'Grande Batalha da Natureza', story:'Última travessia. Questões hard, integradas e com cara de prova. Só os resistentes chegam ao final.', minPercent:85, lives:4, questionLimit:90, shuffle:true, rewardRankIndex:6, difficultyLabel:'Hard, hard, hard' }
     ]
   };
 
@@ -155,8 +151,6 @@
     setValue('introInput', settings.intro);
     setValue('studentThemeNoteInput', settings.studentThemeNote);
     setValue('showMetaInput', String(Boolean(settings.showMetaToStudent)));
-    setValue('fontBodyInput', FONT_OPTIONS.includes(settings.fontBodyKey) ? settings.fontBodyKey : 'inter');
-    setValue('fontHeadingInput', FONT_OPTIONS.includes(settings.fontHeadingKey) ? settings.fontHeadingKey : 'inter');
   }
 
   function collectConfigFromForm() {
@@ -168,8 +162,6 @@
     settings.intro = getValue('introInput');
     settings.studentThemeNote = getValue('studentThemeNoteInput');
     settings.showMetaToStudent = getValue('showMetaInput') === 'true';
-    settings.fontBodyKey = FONT_OPTIONS.includes(getValue('fontBodyInput')) ? getValue('fontBodyInput') : 'inter';
-    settings.fontHeadingKey = FONT_OPTIONS.includes(getValue('fontHeadingInput')) ? getValue('fontHeadingInput') : settings.fontBodyKey;
     settings.phases = settings.phases.map(phase => ({
       ...phase,
       name: getValue(`phase_${phase.id}_name`),
