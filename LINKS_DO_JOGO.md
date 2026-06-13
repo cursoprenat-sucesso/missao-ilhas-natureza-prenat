@@ -33,3 +33,8 @@ Atualização recomendada após subir a V11: abra o link do aluno com `?v=11` no
 
 
 Teste da V16: adicione `?v=16` ao link do aluno e use Ctrl + F5.
+
+
+## Teste V17
+Aluno: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/?v=17`
+Professor: `https://cursoprenat-sucesso.github.io/missao-ilhas-natureza-prenat/professor.html?v=17`
