@@ -44,3 +44,9 @@ Use esta versão quando o navegador/GitHub Pages não mostrar as mudanças. O al
 - O Boss Final agora usa um ícone bem explícito com **🏆 + 🦈**, para não parecer DNA ou símbolo abstrato.
 - O professor continua com as fontes em **2. Configurar missão**.
 - No cadastro de questões foi adicionado um aviso indicando onde alterar as fontes.
+
+
+## V14 Cache definitivo
+- HTML aponta para `app-v14-final.js`, `style-v14-final.css` e `professor-v14-final.js`.
+- Corrige cache persistente do navegador/GitHub Pages.
+- Boss Final permanece com ícone explícito de troféu + tubarão.
