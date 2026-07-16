@@ -6,6 +6,12 @@
   let progress = null;
   let currentRun = null;
 
+  const PRENAT_API_URL = 'https://script.google.com/macros/s/AKfycbz8ep4_hFtI2Ega27IKg-H5_rFBiNHPdt7Z-fk8hx4XIgrYtmxgpf2J1SBbbVShhDfL8A/exec';
+  const STUDENT_KEY = 'prenat_student_identity_v1';
+  const GAME_NAME = 'Missão Ilhas da Natureza';
+  const GAME_DISCIPLINE = 'Natureza';
+  let student = loadStudent();
+
   const FONT_STACKS = {
     inter: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     arial: 'Arial, Helvetica, sans-serif',
@@ -164,6 +170,13 @@
     }
   });
 
+  document.getElementById('changeStudent')?.addEventListener('click', () => {
+    if (confirm('Deseja sair deste aluno e identificar outro estudante neste dispositivo?')) {
+      localStorage.removeItem(STUDENT_KEY);
+      window.location.reload();
+    }
+  });
+
   init();
 
   async function init() {
@@ -173,11 +186,142 @@
       normalizeData();
       progress = loadProgress();
       applyBrand();
-      renderHome();
+      if (student) {
+        updateStudentIdentity();
+        sendAccess();
+        renderHome();
+      } else {
+        renderStudentRegistration();
+      }
     } catch (error) {
       console.error(error);
       app.innerHTML = `<section class="result-card glass-card"><div class="result-icon">⚠️</div><h1>Erro ao carregar</h1><p>Não consegui carregar a missão. Confira se os arquivos settings.json e questions.json foram enviados corretamente.</p></section>`;
     }
+  }
+
+  function loadStudent() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STUDENT_KEY) || 'null');
+      return saved && saved.idAluno && saved.nome && saved.turma ? saved : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function createStudentId() {
+    const random = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`)
+      .replace(/[^a-z0-9]/gi, '')
+      .slice(0, 12)
+      .toUpperCase();
+    return `PRENAT-${random}`;
+  }
+
+  function renderStudentRegistration() {
+    const template = document.getElementById('studentRegistrationTemplate').content.cloneNode(true);
+    app.innerHTML = '';
+    app.appendChild(template);
+    document.getElementById('studentIdentity').textContent = '';
+
+    const form = app.querySelector('#studentRegistrationForm');
+    const errorBox = form.querySelector('[data-registration-error]');
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const nome = String(formData.get('nome') || '').trim().replace(/\s+/g, ' ');
+      const email = String(formData.get('email') || '').trim().toLowerCase();
+      const turma = String(formData.get('turma') || '').trim();
+
+      if (nome.split(' ').filter(Boolean).length < 2) {
+        errorBox.textContent = 'Digite seu nome completo para continuar.';
+        return;
+      }
+
+      student = { idAluno: createStudentId(), nome, email, turma };
+      localStorage.setItem(STUDENT_KEY, JSON.stringify(student));
+      updateStudentIdentity();
+      sendToPrenat({ acao: 'cadastrar_aluno', ...student });
+      sendAccess();
+      renderHome();
+    });
+  }
+
+  function updateStudentIdentity() {
+    const identity = document.getElementById('studentIdentity');
+    if (identity && student) identity.textContent = `${student.nome} · ${student.turma}`;
+  }
+
+  function detectDevice() {
+    const agent = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|Mobile/i.test(agent)) return 'Celular ou tablet';
+    return 'Computador';
+  }
+
+  function sendAccess() {
+    if (!student) return;
+    sendToPrenat({
+      acao: 'registrar_acesso',
+      ...student,
+      jogo: GAME_NAME,
+      disciplina: GAME_DISCIPLINE,
+      tipoAcesso: 'Entrada no jogo',
+      dispositivo: detectDevice()
+    });
+  }
+
+  function calculateStars(percent) {
+    if (percent >= 90) return 5;
+    if (percent >= 80) return 4;
+    if (percent >= 70) return 3;
+    if (percent >= 60) return 2;
+    return percent > 0 ? 1 : 0;
+  }
+
+  function nextAttemptNumber(phaseId) {
+    const key = `${STUDENT_KEY}_attempt_${student?.idAluno || 'guest'}_${phaseId}`;
+    const attempt = Number(localStorage.getItem(key) || 0) + 1;
+    localStorage.setItem(key, String(attempt));
+    return attempt;
+  }
+
+  function sendProgress(run, percent, passed) {
+    if (!student) return;
+    const stars = calculateStars(percent);
+    sendToPrenat({
+      acao: 'registrar_progresso',
+      ...student,
+      jogo: GAME_NAME,
+      disciplina: GAME_DISCIPLINE,
+      ilha: run.phase.name || run.phase.title,
+      missao: run.phase.title || `Fase ${run.phase.id}`,
+      fase: run.phase.id,
+      quantidadeQuestoes: run.questions.length,
+      quantidadeAcertos: run.score,
+      quantidadeErros: Math.max(run.questions.length - run.score, 0),
+      percentualAcertos: percent,
+      estrelas: stars,
+      pontuacao: run.score * 100,
+      tempoRealizacao: formatDuration(Date.now() - run.startedAt),
+      situacao: passed ? 'Concluída' : 'Em andamento',
+      numeroTentativa: nextAttemptNumber(run.phase.id)
+    });
+  }
+
+  function formatDuration(milliseconds) {
+    const seconds = Math.max(0, Math.round(milliseconds / 1000));
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}min ${seconds % 60}s`;
+  }
+
+  function sendToPrenat(payload) {
+    fetch(PRENAT_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      cache: 'no-store',
+      keepalive: true,
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(payload)
+    }).catch(error => console.warn('Registro PRENAT+ pendente:', error));
   }
 
   async function fetchJson(url, fallback) {
@@ -389,6 +533,7 @@
       index: 0,
       lives: phase.lives,
       score: 0,
+      startedAt: Date.now(),
       answered: false
     };
     renderQuestion();
@@ -498,6 +643,7 @@
       progress.phaseScores[run.phase.id] = { score: run.score, total: run.questions.length, percent, date: new Date().toISOString(), poolSize: run.poolSize };
       saveProgress();
     }
+    sendProgress(run, percent, passed);
     renderResult({ passed, percent, previousRank, nextRank, run });
   }
 

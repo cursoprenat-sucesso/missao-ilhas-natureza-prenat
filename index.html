@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PRENAT+ | Missão Ilhas da Natureza</title>
   <meta name="description" content="Jogo gamificado PRENAT+ para treino de Ciências da Natureza." />
-  <link rel="stylesheet" href="style-v17-final.css?v=17" />
+  <link rel="stylesheet" href="style-v17-final.css?v=18" />
   <script>
     window.MathJax = {
       tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
@@ -30,7 +30,11 @@
         <span id="missionMini">Missão Ilhas da Natureza</span>
       </div>
     </div>
-    <button id="resetProgress" class="btn btn-ghost">Recomeçar missão</button>
+    <div class="student-actions">
+      <span id="studentIdentity" class="student-identity" aria-live="polite"></span>
+      <button id="changeStudent" class="btn btn-ghost">Trocar aluno</button>
+      <button id="resetProgress" class="btn btn-ghost">Recomeçar missão</button>
+    </div>
   </header>
 
   <main id="app" class="app-shell">
@@ -40,6 +44,38 @@
       <p>Preparando o arquipélago, as patentes e os desafios.</p>
     </section>
   </main>
+
+  <template id="studentRegistrationTemplate">
+    <section class="registration-overlay" role="dialog" aria-modal="true" aria-labelledby="registrationTitle">
+      <article class="registration-card glass-card fade-in">
+        <img class="registration-logo" src="logo-prenat.png" alt="PRENAT+" />
+        <p class="kicker">IDENTIFICAÇÃO DO NAVEGADOR</p>
+        <h1 id="registrationTitle">Antes de iniciar a travessia</h1>
+        <p class="registration-intro">Informe seus dados para que seu acesso, suas tentativas e suas conquistas sejam registrados no PRENAT+.</p>
+        <form id="studentRegistrationForm" class="registration-form">
+          <label>
+            <span>Nome completo</span>
+            <input name="nome" type="text" autocomplete="name" maxlength="120" required placeholder="Digite seu nome completo" />
+          </label>
+          <label>
+            <span>E-mail</span>
+            <input name="email" type="email" autocomplete="email" maxlength="160" required placeholder="Digite seu melhor e-mail" />
+          </label>
+          <label>
+            <span>Turma</span>
+            <select name="turma" required>
+              <option value="">Selecione sua turma</option>
+              <option value="PRENAT+ | Oceano Atlântico | Extensiva">PRENAT+ | Oceano Atlântico | Extensiva</option>
+              <option value="PRENAT+ | Oceano Pacífico | Intensiva">PRENAT+ | Oceano Pacífico | Intensiva</option>
+            </select>
+          </label>
+          <p class="registration-error" data-registration-error aria-live="polite"></p>
+          <button class="btn btn-primary btn-pulse" type="submit">INICIAR MISSÃO</button>
+        </form>
+        <p class="registration-privacy">Seus dados serão usados exclusivamente para acompanhar sua evolução pedagógica no PRENAT+.</p>
+      </article>
+    </section>
+  </template>
 
   <template id="homeTemplate">
     <section class="hero-flow fade-in">
@@ -145,6 +181,6 @@
     </section>
   </template>
 
-  <script src="app-v17-final.js?v=17"></script>
+  <script src="app-v17-final.js?v=18"></script>
 </body>
 </html>
