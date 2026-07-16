@@ -152,6 +152,13 @@
   color: #055274;
   font-weight: 800;
 }
+.registration-form small{color:#637983;font-size:.75rem;font-weight:600}
+.btn-ranking{color:#613f00;background:linear-gradient(135deg,#fff4b8,#fccc46);border:1px solid rgba(154,105,0,.2);box-shadow:0 8px 20px rgba(252,204,70,.25)}
+.ranking-overlay{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:20px;background:rgba(3,35,52,.78);backdrop-filter:blur(12px)}
+.ranking-modal{width:min(920px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:clamp(24px,4vw,42px);text-align:center}
+.ranking-modal h1{margin:.35rem 0;color:#055274}.ranking-subtitle{color:#607780;margin:0 0 24px}.ranking-close{position:absolute;right:18px;top:14px;border:0;background:#eef7f8;color:#055274;width:38px;height:38px;border-radius:50%;font-size:1.7rem;cursor:pointer}
+.podium-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:end;margin:26px 0}.podium-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:22px 12px;border-radius:22px;background:#f4f8f9;border:1px solid #d8eff2}.podium-1{order:2;padding-top:32px;background:linear-gradient(180deg,#fff4b8,#fff)}.podium-2{order:1}.podium-3{order:3;background:linear-gradient(180deg,#f6dcc5,#fff)}.podium-medal{font-size:2rem}.podium-turtle{font-size:2.4rem}.podium-card strong{color:#055274;font-size:1.08rem}.podium-card small{color:#687d86}.podium-card b{color:#916700}
+.my-ranking{margin:18px 0;padding:14px;border-radius:15px;background:linear-gradient(135deg,#e4fbfa,#fff4d3);color:#055274;border:2px solid #09999f}.ranking-list{display:grid;gap:8px;text-align:left}.ranking-row{display:grid;grid-template-columns:60px 1fr 90px;gap:10px;align-items:center;padding:12px 16px;border-radius:14px;background:#f1f7f8;color:#31515f}.ranking-row strong{color:#055274}.ranking-row b{text-align:right;color:#916700}.ranking-error{color:#b4235d;font-weight:800}
 
 .registration-form input,
 .registration-form select {
@@ -196,4 +203,5 @@
   .student-actions .btn { padding-inline: .65rem; font-size: .76rem; }
   .registration-overlay { padding: 12px; }
   .registration-card { max-height: calc(100vh - 24px); }
+  .podium-grid{grid-template-columns:1fr}.podium-card{order:initial!important;padding:16px}.ranking-modal{padding:24px 14px}.ranking-row{grid-template-columns:46px 1fr 70px}.student-actions .btn-ranking{display:inline-flex}
 }

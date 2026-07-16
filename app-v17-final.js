@@ -177,6 +177,8 @@
     }
   });
 
+  document.getElementById('openRanking')?.addEventListener('click', openRanking);
+
   init();
 
   async function init() {
@@ -231,13 +233,24 @@
       const nome = String(formData.get('nome') || '').trim().replace(/\s+/g, ' ');
       const email = String(formData.get('email') || '').trim().toLowerCase();
       const turma = String(formData.get('turma') || '').trim();
+      const apelido = String(formData.get('apelido') || '').trim().replace(/\s+/g, ' ');
 
       if (nome.split(' ').filter(Boolean).length < 2) {
         errorBox.textContent = 'Digite seu nome completo para continuar.';
         return;
       }
 
-      student = { idAluno: createStudentId(), nome, email, turma };
+      if (apelido.length < 3 || apelido.length > 20) {
+        errorBox.textContent = 'O apelido precisa ter entre 3 e 20 caracteres.';
+        return;
+      }
+
+      if (/@|https?:|www\.|\d{8,}/i.test(apelido)) {
+        errorBox.textContent = 'Não use e-mail, telefone ou link no apelido.';
+        return;
+      }
+
+      student = { idAluno: createStudentId(), nome, email, turma, apelido };
       localStorage.setItem(STUDENT_KEY, JSON.stringify(student));
       updateStudentIdentity();
       sendToPrenat({ acao: 'cadastrar_aluno', ...student });
@@ -248,7 +261,60 @@
 
   function updateStudentIdentity() {
     const identity = document.getElementById('studentIdentity');
-    if (identity && student) identity.textContent = `${student.nome} · ${student.turma}`;
+    if (identity && student) identity.textContent = `${student.apelido || student.nome} · ${student.turma}`;
+  }
+
+  function jsonp(params) {
+    return new Promise((resolve, reject) => {
+      const callback = `prenatRanking_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => finish(new Error('Tempo de consulta esgotado.')), 12000);
+      function finish(error, data) {
+        clearTimeout(timeout);
+        delete window[callback];
+        script.remove();
+        error ? reject(error) : resolve(data);
+      }
+      window[callback] = data => finish(null, data);
+      script.onerror = () => finish(new Error('Não foi possível consultar o ranking.'));
+      const query = new URLSearchParams({ ...params, callback });
+      script.src = `${PRENAT_API_URL}?${query.toString()}`;
+      document.head.appendChild(script);
+    });
+  }
+
+  async function openRanking() {
+    const template = document.getElementById('rankingTemplate').content.cloneNode(true);
+    document.body.appendChild(template);
+    const overlay = document.querySelector('.ranking-overlay');
+    const content = overlay.querySelector('.ranking-content');
+    const close = () => overlay.remove();
+    overlay.querySelector('.ranking-close').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+
+    try {
+      const data = await jsonp({ acao: 'ranking', jogo: GAME_NAME, idAluno: student?.idAluno || '' });
+      if (!data?.sucesso) throw new Error(data?.mensagem || 'Ranking indisponível.');
+      renderPublicRanking(content, data);
+    } catch (error) {
+      content.innerHTML = `<p class="ranking-error">${escapeHtml(error.message)}</p>`;
+    }
+  }
+
+  function renderPublicRanking(container, data) {
+    const rows = Array.isArray(data.top10) ? data.top10 : [];
+    const podiumMeta = [
+      { medal:'🥇', title:'Tartaruga Catalisadora' },
+      { medal:'🥈', title:'Tartaruga Navegadora' },
+      { medal:'🥉', title:'Tartaruga Guardiã' }
+    ];
+    const podium = podiumMeta.map((meta, index) => {
+      const item = rows[index];
+      return `<div class="podium-card podium-${index + 1}"><span class="podium-medal">${meta.medal}</span><span class="podium-turtle">🐢</span><strong>${item ? escapeHtml(item.apelido) : 'Vaga aberta'}</strong><small>${meta.title}</small><b>${item ? `${Number(item.estrelas) || 0} ⭐` : '—'}</b></div>`;
+    }).join('');
+    const list = rows.map(item => `<div class="ranking-row"><span>${Number(item.posicao) || '—'}º</span><strong>${escapeHtml(item.apelido)}</strong><b>${Number(item.estrelas) || 0} ⭐</b></div>`).join('');
+    const mine = data.minhaPosicao ? `<div class="my-ranking">🌊 Sua posição: <strong>${Number(data.minhaPosicao.posicao)}º — ${escapeHtml(data.minhaPosicao.apelido)}</strong> · ${Number(data.minhaPosicao.estrelas) || 0} ⭐</div>` : '';
+    container.innerHTML = `<div class="podium-grid">${podium}</div>${mine}<div class="ranking-list">${list || '<p>Ainda não há navegadores classificados.</p>'}</div>`;
   }
 
   function detectDevice() {

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PRENAT+ | Missão Ilhas da Natureza</title>
   <meta name="description" content="Jogo gamificado PRENAT+ para treino de Ciências da Natureza." />
-  <link rel="stylesheet" href="style-v17-final.css?v=18" />
+  <link rel="stylesheet" href="style-v17-final.css?v=19" />
   <script>
     window.MathJax = {
       tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
@@ -32,6 +32,7 @@
     </div>
     <div class="student-actions">
       <span id="studentIdentity" class="student-identity" aria-live="polite"></span>
+      <button id="openRanking" class="btn btn-ranking">🏆 Ver ranking</button>
       <button id="changeStudent" class="btn btn-ghost">Trocar aluno</button>
       <button id="resetProgress" class="btn btn-ghost">Recomeçar missão</button>
     </div>
@@ -62,6 +63,11 @@
             <input name="email" type="email" autocomplete="email" maxlength="160" required placeholder="Digite seu melhor e-mail" />
           </label>
           <label>
+            <span>Apelido de navegador</span>
+            <input name="apelido" type="text" minlength="3" maxlength="20" required placeholder="Como você aparecerá no ranking" />
+            <small>O ranking mostrará somente seu apelido, estrelas e posição.</small>
+          </label>
+          <label>
             <span>Turma</span>
             <select name="turma" required>
               <option value="">Selecione sua turma</option>
@@ -73,6 +79,18 @@
           <button class="btn btn-primary btn-pulse" type="submit">INICIAR MISSÃO</button>
         </form>
         <p class="registration-privacy">Seus dados serão usados exclusivamente para acompanhar sua evolução pedagógica no PRENAT+.</p>
+      </article>
+    </section>
+  </template>
+
+  <template id="rankingTemplate">
+    <section class="ranking-overlay" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
+      <article class="ranking-modal glass-card fade-in">
+        <button class="ranking-close" type="button" aria-label="Fechar ranking">×</button>
+        <p class="kicker">RANKING DOS NAVEGADORES</p>
+        <h1 id="rankingTitle">Pódio da Natureza</h1>
+        <p class="ranking-subtitle">Apenas apelido, estrelas e posição são exibidos.</p>
+        <div class="ranking-content"><div class="ranking-loading">Carregando o pódio…</div></div>
       </article>
     </section>
   </template>
@@ -181,6 +199,6 @@
     </section>
   </template>
 
-  <script src="app-v17-final.js?v=18"></script>
+  <script src="app-v17-final.js?v=19"></script>
 </body>
 </html>
