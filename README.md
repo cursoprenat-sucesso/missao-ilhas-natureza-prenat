@@ -1,15 +1,37 @@
-# PRENAT+ | Missão Ilhas da Natureza — V17 Final Corrigido
+# PRENAT+ | Natureza — Banco rotativo V23
 
-Esta versão corrige o apontamento do HTML.
+Versão com banco rotativo de questões por aluno.
 
-## Arquivos usados pelo aluno
-- `index.html` chama `style-v17-final.css?v=17`
-- `index.html` chama `app-v17-final.js?v=17`
+## Regra implementada
 
-## Arquivos usados pelo professor
-- `professor.html` chama `professor-v17-final.js?v=17`
+O aluno só repete uma questão depois de esgotar todo o banco daquela ilha/ciclo.
 
-## Correções
-- Boss Final com ícone explícito de troféu + tubarão.
-- Campo de fontes em `2. Configurar missão`.
-- Mantém banco de questões, imagens, fórmulas, subscrito, sobrescrito, flow e sorteio de questões.
+Exemplo: se a ilha tem 50 questões e a tentativa usa 10, as próximas tentativas vão priorizar questões ainda não vistas. Se restarem menos questões inéditas do que a quantidade da tentativa, o jogo aplica somente as restantes para encerrar o ciclo. Na tentativa seguinte, um novo ciclo é iniciado.
+
+## Permanece ativo
+
+- Cadastro do aluno
+- Ranking/registro via Google Planilhas
+- Importador CSV no professor
+- Feedback positivo
+- Feedback negativo
+- Backup automático
+- Validação contra alternativas duplicadas
+- Embaralhamento de questões e alternativas
+
+## Atenção
+
+Esse controle é salvo no navegador/dispositivo do aluno, associado ao aluno identificado no jogo. Para sincronizar entre aparelhos diferentes, será necessária uma próxima etapa com consulta ao Google Apps Script/Planilhas.
+
+## Links após subir no GitHub
+
+Aluno:
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza/?v=24
+
+Professor:
+https://cursoprenat-sucesso.github.io/missao-ilhas-natureza/professor.html?v=24
+
+
+## Correção V24
+
+As alternativas agora ficam fixas na ordem cadastrada. Isso evita divergência entre a letra indicada no feedback e a alternativa marcada no jogo do aluno.
