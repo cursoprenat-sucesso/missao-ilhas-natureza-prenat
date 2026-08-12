@@ -120,6 +120,25 @@
           <button class="btn btn-primary" id="saveQuestionBtn">Salvar questão</button>
           <button class="btn btn-soft" id="clearQuestionBtn">Limpar formulário</button>
         </div>
+
+        <div class="success-tip" style="margin-top:24px">
+          <strong>Importação em lote por planilha</strong>
+          <p>Use CSV com colunas: <strong>Enunciado</strong>, <strong>Categoria</strong>, <strong>Feedback Positivo</strong>, <strong>Feedback Negativo</strong>, <strong>Alternativas</strong> e <strong>Correta</strong>. Opcionalmente, use a coluna <strong>Imagem</strong>.</p>
+          <div class="teacher-actions">
+            <label class="btn btn-primary">Importar planilha CSV <input type="file" id="importQuestionsCsv" accept=".csv,text/csv" hidden></label>
+            <button type="button" class="btn btn-soft" id="downloadCsvModelNatureza">Baixar modelo CSV</button>
+          </div>
+        </div>
+        <div class="success-tip" style="margin-top:14px">
+          <strong>Importação em lote com imagens</strong>
+          <p>Use um arquivo ZIP contendo <strong>questoes.csv</strong> e uma pasta <strong>imagens</strong>. Na coluna <strong>Imagem</strong> do CSV, escreva o nome exato do arquivo, por exemplo: Q001.png.</p>
+          <div class="teacher-actions">
+            <label class="btn btn-primary">Importar ZIP com imagens <input type="file" id="importQuestionsZipImages" accept=".zip,application/zip" hidden></label>
+            <button type="button" class="btn btn-soft" id="downloadZipImageTemplate">Baixar modelo ZIP com imagens</button>
+          </div>
+          <p class="warning-tip">Imagens leves em PNG/JPG/WEBP são melhores. O sistema converte a imagem para dentro do questions.json.</p>
+        </div>
+
         <h2 style="margin-top:30px">Banco de questões</h2>
         <div id="questionBankList" class="question-bank-list"></div>
       </section>
@@ -149,6 +168,7 @@
     </section>
   </main>
 
-  <script src="professor-v17-final.js?v=24"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="professor-v17-final.js?v=25"></script>
 </body>
 </html>

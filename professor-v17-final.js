@@ -126,6 +126,10 @@
     document.getElementById('clearQuestionBtn')?.addEventListener('click', clearQuestionForm);
     document.getElementById('downloadSettings')?.addEventListener('click', () => { collectConfigFromForm(); downloadJson('settings.json', settings); });
     document.getElementById('downloadQuestions')?.addEventListener('click', () => downloadJson('questions.json', questions));
+    document.getElementById('importQuestionsCsv')?.addEventListener('change', importCsvQuestionsNatureza);
+    document.getElementById('downloadCsvModelNatureza')?.addEventListener('click', downloadCsvModelNatureza);
+    document.getElementById('importQuestionsZipImages')?.addEventListener('change', importQuestionsFromZipWithImagesNatureza);
+    document.getElementById('downloadZipImageTemplate')?.addEventListener('click', downloadZipImageTemplateNatureza);
     document.getElementById('importSettings')?.addEventListener('change', e => importJsonFile(e, data => {
       settings = { ...DEFAULT_SETTINGS, ...data };
       normalize();
@@ -508,6 +512,278 @@
     wrap.classList.remove('hidden');
   }
 
+
+
+
+  // ===== PRENAT+ CSV/ZIP IMPORT COM IMAGENS =====
+  function normalizeHeaderNatureza(value) {
+    return String(value || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+
+  function parseCsvTextNatureza(text) {
+    const rows = [];
+    let current = [];
+    let cell = '';
+    let inQuotes = false;
+    const input = String(text || '').replace(/^\uFEFF/, '');
+    for (let i = 0; i < input.length; i++) {
+      const ch = input[i];
+      const next = input[i + 1];
+      if (ch === '"') {
+        if (inQuotes && next === '"') { cell += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ';' && !inQuotes) {
+        current.push(cell); cell = '';
+      } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+        if (ch === '\r' && next === '\n') i++;
+        current.push(cell); cell = '';
+        if (current.some(v => String(v).trim() !== '')) rows.push(current);
+        current = [];
+      } else {
+        cell += ch;
+      }
+    }
+    current.push(cell);
+    if (current.some(v => String(v).trim() !== '')) rows.push(current);
+    if (!rows.length) return [];
+    const headers = rows[0].map(h => String(h || '').trim());
+    return rows.slice(1).map(values => {
+      const row = {};
+      headers.forEach((header, index) => { row[header] = values[index] ?? ''; });
+      return row;
+    }).filter(row => Object.values(row).some(v => String(v).trim() !== ''));
+  }
+
+  function pickCsvCellNatureza(row, names) {
+    const entries = Object.entries(row || {});
+    for (const name of names) {
+      const wanted = normalizeHeaderNatureza(name);
+      const found = entries.find(([key]) => normalizeHeaderNatureza(key) === wanted);
+      if (found && String(found[1] ?? '').trim() !== '') return String(found[1]).trim();
+    }
+    return '';
+  }
+
+  function truthyCsvNatureza(value) {
+    return /^(sim|s|yes|y|true|1|correta|certo|x)$/i.test(String(value || '').trim());
+  }
+
+  function csvQuoteNatureza(value) {
+    return '"' + String(value ?? '').replace(/"/g, '""') + '"';
+  }
+
+  function phaseFromCsvNatureza(value) {
+    const text = String(value || '').trim();
+    const direct = Number(text);
+    if (Number.isFinite(direct) && direct > 0) return direct;
+    const match = text.match(/\d+/);
+    if (match) return Number(match[0]);
+    const normalized = normalizeHeaderNatureza(text);
+    const found = settings.phases?.find(p => normalizeHeaderNatureza(p.name).includes(normalized) || normalized.includes(normalizeHeaderNatureza(p.name)));
+    return Number(found?.id || 1);
+  }
+
+  function metadataFromCsvNatureza(row, key) {
+    for (let i = 1; i <= 5; i++) {
+      const meta = pickCsvCellNatureza(row, [`Metadado ${i}`, `Metadata ${i}`]);
+      const val = pickCsvCellNatureza(row, [`Valor ${i}`, `Value ${i}`]);
+      if (normalizeHeaderNatureza(meta) === normalizeHeaderNatureza(key)) return val;
+    }
+    return '';
+  }
+
+  function questionFromCsvRowNatureza(row, index) {
+    const statement = pickCsvCellNatureza(row, ['Enunciado','Questão','Questao','Texto','Statement']);
+    if (!statement) return null;
+    const positive = pickCsvCellNatureza(row, ['Feedback Positivo','Feedback quando acertar','Feedback Correto','Comentário correto']);
+    const negative = pickCsvCellNatureza(row, ['Feedback Negativo','Feedback quando errar','Feedback Incorreto','Comentário errado']);
+    const category = pickCsvCellNatureza(row, ['Categoria','Tema','Assunto','Conteúdo','Conteudo']);
+    const phase = phaseFromCsvNatureza(pickCsvCellNatureza(row, ['Ilha/Fase','Ilha','Fase','Phase']));
+    const options = [];
+    for (let i = 1; i <= 8; i++) {
+      const text = pickCsvCellNatureza(row, [`Alternativa ${i}`, `Alternativa ${String.fromCharCode(64+i)}`, `Opção ${i}`, `Opcao ${i}`]);
+      if (!text) continue;
+      const correct = truthyCsvNatureza(pickCsvCellNatureza(row, [`Alternativa ${i} Correta`, `Correta ${i}`, `Gabarito ${i}`]));
+      options.push({ text, correct, feedback: correct ? positive : negative });
+    }
+    if (options.length < 2) return null;
+    if (!options.some(op => op.correct)) options[0].correct = true;
+    return normalizeQuestion({
+      id: makeId(),
+      phase,
+      discipline: metadataFromCsvNatureza(row, 'Disciplina') || pickCsvCellNatureza(row, ['Disciplina']),
+      topic: metadataFromCsvNatureza(row, 'Tema') || category,
+      difficulty: metadataFromCsvNatureza(row, 'Dificuldade') || metadataFromCsvNatureza(row, 'Nível') || pickCsvCellNatureza(row, ['Dificuldade','Nível','Nivel']),
+      statement,
+      image: pickCsvCellNatureza(row, ['Imagem','Image','Arquivo da Imagem','Nome da Imagem','URL da Imagem','Link da Imagem']),
+      options,
+      explanation: [positive, negative].filter(Boolean).join('\n\n')
+    });
+  }
+
+  function validateImportedQuestionNatureza(q) {
+    const problems = [];
+    if (!q.statement || !q.statement.trim()) problems.push('sem enunciado');
+    if (!Array.isArray(q.options) || q.options.length < 2) problems.push('menos de duas alternativas');
+    if (Array.isArray(q.options) && !q.options.some(op => op.correct)) problems.push('sem alternativa correta');
+    if (!Number(q.phase)) problems.push('sem ilha/fase válida');
+    return problems;
+  }
+
+  function addImportedQuestionsNatureza(imported, label) {
+    const invalid = [];
+    imported.forEach((q, i) => {
+      const problems = validateImportedQuestionNatureza(q);
+      if (problems.length) invalid.push(`Questão ${i + 1}: ${problems.join('; ')}`);
+    });
+    if (invalid.length) {
+      alert('Problema(s) encontrado(s):\n\n' + invalid.slice(0, 12).join('\n') + (invalid.length > 12 ? `\n... e mais ${invalid.length - 12}` : ''));
+      return false;
+    }
+    const byPhase = {};
+    imported.forEach(q => { byPhase[q.phase] = (byPhase[q.phase] || 0) + 1; });
+    const resumo = Object.entries(byPhase).map(([phase, count]) => {
+      const p = settings.phases?.find(item => Number(item.id) === Number(phase));
+      return `${p?.name || 'Ilha ' + phase}: ${count}`;
+    }).join('\n');
+    if (!confirm(`Importar ${imported.length} questão(ões) de ${label}?\n\n${resumo}\n\nAs questões serão adicionadas ao banco atual.`)) return false;
+    questions = [...questions, ...imported].map(normalizeQuestion);
+    renderQuestionBank();
+    alert(`Importação concluída.\n\nQuestões adicionadas: ${imported.length}\nBanco atual: ${questions.length} questão(ões).`);
+    return true;
+  }
+
+  function importCsvQuestionsNatureza(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const rows = parseCsvTextNatureza(reader.result);
+        const imported = rows.map(questionFromCsvRowNatureza).filter(Boolean);
+        if (!imported.length) return alert('Nenhuma questão válida encontrada no CSV. Confira Enunciado, Alternativas e Correta.');
+        addImportedQuestionsNatureza(imported, 'CSV');
+      } catch (error) {
+        console.error(error);
+        alert('Não foi possível importar a planilha. Salve como CSV separado por ponto e vírgula e tente novamente.');
+      } finally {
+        event.target.value = '';
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  function getZipImageMimeNatureza(filename) {
+    const ext = String(filename || '').split('.').pop().toLowerCase();
+    if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+    if (ext === 'png') return 'image/png';
+    if (ext === 'webp') return 'image/webp';
+    if (ext === 'gif') return 'image/gif';
+    if (ext === 'svg') return 'image/svg+xml';
+    return 'application/octet-stream';
+  }
+
+  function basenameNatureza(path) {
+    return String(path || '').split('/').pop().split('\\').pop().trim();
+  }
+
+  function normalizeImageNameNatureza(name) {
+    return normalizeHeaderNatureza(basenameNatureza(name));
+  }
+
+  async function buildImageMapNatureza(zip) {
+    const imageMap = {};
+    const entries = Object.values(zip.files || {});
+    for (const entry of entries) {
+      if (entry.dir || entry.name.includes('__MACOSX/')) continue;
+      if (!/\.(png|jpe?g|webp|gif|svg)$/i.test(entry.name)) continue;
+      const base = basenameNatureza(entry.name);
+      const dataUrl = `data:${getZipImageMimeNatureza(base)};base64,${await entry.async('base64')}`;
+      imageMap[normalizeImageNameNatureza(base)] = dataUrl;
+      imageMap[normalizeImageNameNatureza(entry.name)] = dataUrl;
+    }
+    return imageMap;
+  }
+
+  function findCsvFileNatureza(zip) {
+    const files = Object.values(zip.files || {}).filter(entry => !entry.dir && !entry.name.includes('__MACOSX/') && /\.csv$/i.test(entry.name));
+    if (!files.length) return null;
+    return files.find(entry => /(^|\/)questoes\.csv$/i.test(entry.name)) || files[0];
+  }
+
+  async function importQuestionsFromZipWithImagesNatureza(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (typeof JSZip === 'undefined') {
+      alert('A biblioteca JSZip não carregou. Confira a internet e recarregue o professor.');
+      event.target.value = '';
+      return;
+    }
+    try {
+      const zip = await JSZip.loadAsync(file);
+      const csvFile = findCsvFileNatureza(zip);
+      if (!csvFile) return alert('O ZIP não possui arquivo CSV. Inclua um arquivo chamado questoes.csv.');
+      const imageMap = await buildImageMapNatureza(zip);
+      const rows = parseCsvTextNatureza(await csvFile.async('string'));
+      const missing = [];
+      const imported = rows.map((row, index) => {
+        const q = questionFromCsvRowNatureza(row, index);
+        if (!q) return null;
+        const imageRef = pickCsvCellNatureza(row, ['Imagem','Image','Arquivo da Imagem','Nome da Imagem','URL da Imagem','Link da Imagem']);
+        if (imageRef) {
+          const linked = imageMap[normalizeImageNameNatureza(imageRef)];
+          if (linked) q.image = linked;
+          else if (/^https?:\/\//i.test(imageRef) || /^data:image\//i.test(imageRef)) q.image = imageRef;
+          else { q.image = ''; missing.push(`Linha ${index + 2}: ${imageRef}`); }
+        }
+        return q;
+      }).filter(Boolean);
+      if (!imported.length) return alert('Nenhuma questão válida foi encontrada no ZIP.');
+      const withImages = imported.filter(q => q.image && String(q.image).startsWith('data:image/')).length;
+      let extra = missing.length ? `\n\nAtenção: ${missing.length} imagem(ns) citada(s) não foram encontradas:\n${missing.slice(0, 8).join('\n')}` : '';
+      if (extra) alert(extra);
+      if (addImportedQuestionsNatureza(imported, `ZIP com imagens\n\nImagens vinculadas: ${withImages}${extra}`)) {
+        // ok
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Não foi possível importar o ZIP. Confira se ele contém questoes.csv e imagens PNG, JPG ou WEBP.');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  function downloadCsvModelNatureza() {
+    const headers = ['Enunciado','Categoria','Feedback Positivo','Feedback Negativo','Alternativa 1','Alternativa 1 Correta','Alternativa 2','Alternativa 2 Correta','Alternativa 3','Alternativa 3 Correta','Alternativa 4','Alternativa 4 Correta','Alternativa 5','Alternativa 5 Correta','Alternativa 6','Alternativa 6 Correta','Alternativa 7','Alternativa 7 Correta','Alternativa 8','Alternativa 8 Correta','Metadado 1','Valor 1','Metadado 2','Valor 2','Metadado 3','Valor 3','Ilha/Fase','Imagem'];
+    const row = ['Observe a imagem associada ao item e responda à questão teste de Natureza.','Teste com imagem','Parabéns, você acertou! 🐢💙 A imagem foi vinculada corretamente ao item.','Que pena, não foi dessa vez, mas vou te explicar para você evoluir! 🐢💙 Este é um teste de importação.','Alternativa correta de teste','Sim','Distrator 1','','Distrator 2','','Distrator 3','','Distrator 4','','','','','','','', 'Ano','2026','Disciplina','Natureza','Dificuldade','Teste','1','Q001.png'];
+    const csv = headers.map(csvQuoteNatureza).join(';') + '\n' + row.map(csvQuoteNatureza).join(';');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'modelo-importacao-natureza-prenat.csv';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  }
+
+  function downloadZipImageTemplateNatureza() {
+    if (typeof JSZip === 'undefined') return alert('A biblioteca JSZip não carregou. Confira a internet e recarregue o professor.');
+    const headers = ['Enunciado','Categoria','Feedback Positivo','Feedback Negativo','Alternativa 1','Alternativa 1 Correta','Alternativa 2','Alternativa 2 Correta','Alternativa 3','Alternativa 3 Correta','Alternativa 4','Alternativa 4 Correta','Alternativa 5','Alternativa 5 Correta','Alternativa 6','Alternativa 6 Correta','Alternativa 7','Alternativa 7 Correta','Alternativa 8','Alternativa 8 Correta','Metadado 1','Valor 1','Metadado 2','Valor 2','Metadado 3','Valor 3','Ilha/Fase','Imagem'];
+    const row = ['Observe a imagem associada ao item e responda à questão teste de Natureza.','Teste com imagem','Parabéns, você acertou! 🐢💙 A imagem foi vinculada corretamente ao item.','Que pena, não foi dessa vez, mas vou te explicar para você evoluir! 🐢💙 Este é um teste de importação.','Alternativa correta de teste','Sim','Distrator 1','','Distrator 2','','Distrator 3','','Distrator 4','','','','','','','', 'Ano','2026','Disciplina','Natureza','Dificuldade','Teste','1','Q001.png'];
+    const csv = headers.map(csvQuoteNatureza).join(';') + '\n' + row.map(csvQuoteNatureza).join(';');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520"><rect width="900" height="520" fill="#fff"/><rect x="40" y="40" width="820" height="440" rx="32" fill="#e8fbfb" stroke="#09999F" stroke-width="8"/><text x="450" y="120" font-family="Arial" font-size="46" font-weight="700" text-anchor="middle" fill="#055274">Imagem teste PRENAT+</text><text x="450" y="280" font-family="Arial" font-size="54" font-weight="700" text-anchor="middle" fill="#D01890">Q001.png</text><text x="450" y="410" font-family="Arial" font-size="28" text-anchor="middle" fill="#055274">Se aparecer no aluno, funcionou.</text></svg>`;
+    const zip = new JSZip();
+    zip.file('questoes.csv', csv);
+    zip.folder('imagens').file('Q001.png', svg);
+    zip.file('LEIA-ME.txt', 'Modelo PRENAT+ para importação com imagens. Mantenha questoes.csv e a pasta imagens.');
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'modelo-zip-com-imagens-natureza-prenat.zip';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+    });
+  }
+  // ===== FIM CSV/ZIP IMPORT COM IMAGENS =====
 
   function downloadJson(filename, data) {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
